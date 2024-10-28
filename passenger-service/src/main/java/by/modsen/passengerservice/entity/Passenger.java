@@ -1,9 +1,8 @@
 package by.modsen.passengerservice.entity;
 
-import by.modsen.passengerservice.enums.PaymentMethod;
+import by.modsen.passengerservice.entity.enums.PaymentMethod;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +26,6 @@ public class Passenger {
     @Column(nullable = false)
     private String username;
 
-    @Size(min = 8)
     @Column(nullable = false)
     private String password;
 
@@ -50,10 +48,8 @@ public class Passenger {
     @Column(name = "rating")
     private List<Integer> ratings =  new ArrayList<>();
 
-    @Column(name = "created_utc")
     private Instant createdAt;
 
-    @Column(name = "updated_utc")
     private Instant updatedAt;
 
     @PrePersist

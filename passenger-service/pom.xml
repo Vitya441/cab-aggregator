@@ -42,12 +42,27 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Map Struct -->
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Map Struct after Lombok else ERROR NULL -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
 			<version>${mapstruct.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>${mapstruct.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
 
 		<!-- Docs -->
 		<dependency>
@@ -56,12 +71,7 @@
 			<version>2.6.0</version>
 		</dependency>
 
-		<!-- Lombok -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
-		</dependency>
+
 
 
 

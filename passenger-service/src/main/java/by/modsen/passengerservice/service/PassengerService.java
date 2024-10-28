@@ -1,6 +1,9 @@
 package by.modsen.passengerservice.service;
 
+import by.modsen.passengerservice.dto.PassengerCreateDto;
+import by.modsen.passengerservice.dto.PassengerDto;
 import by.modsen.passengerservice.entity.Passenger;
+import by.modsen.passengerservice.mapper.PassengerMapper;
 import by.modsen.passengerservice.repository.PassengerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,24 +14,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PassengerService {
 
-    private final PassengerRepository repository;
+    private final PassengerRepository passengerRepository;
+    private final PassengerMapper mapper;
 
-    public void createPassenger(Passenger passenger) {
-        repository.save(passenger);
+    public void createPassenger(PassengerCreateDto passengerCreateDto) {
+        Passenger passenger = mapper.toPassenger(passengerCreateDto);
+        passengerRepository.save(passenger);
     }
 
-    public Passenger getPassengerById(Long id) {
-        return repository.findById(id).orElse(null);
+    public List<PassengerDto> getAllPassengers() {
+        List<Passenger> passengers = passengerRepository.findAll();
+        return mapper.toPassengerDtos(passengers);
     }
 
-    public List<Passenger> getAllPassengers() {
-        return repository.findAll();
+    public PassengerDto getPassengerById(Long id) {
+        Passenger passenger = passengerRepository.findById(id).orElse(null);
+        return mapper.toPassengerDto(passenger);
     }
 
-    public void deleteById(Long id) {
-        repository.deleteById(id);
+    public void deletePassengerById(Long id) {
+        passengerRepository.deleteById(id);
     }
-
-
-
 }

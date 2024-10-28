@@ -1,4 +1,4 @@
-package by.modsen.passengerservice.enums;
+package by.modsen.passengerservice.entity.enums;
 
 public enum PaymentMethod {
     CASH,

@@ -1,7 +1,7 @@
 package by.modsen.passengerservice.dto;
 
 import by.modsen.passengerservice.entity.PersonalInfo;
-import by.modsen.passengerservice.enums.PaymentMethod;
+import by.modsen.passengerservice.entity.enums.PaymentMethod;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -15,6 +15,7 @@ public record PassengerDto(Long id,
                            PaymentMethod preferredPaymentMethod,
                            BigDecimal balance,
                            List<Integer> ratings,
+//                           Double averageRating,
                            Instant createdAt,
                            Instant updatedAt
 ) {}
