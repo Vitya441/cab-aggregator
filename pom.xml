@@ -22,8 +22,8 @@
         <module>event-broker-service</module>
         <module>gateway-service</module>
         <module>keycloak-service</module>
+        <module>common-module</module>
     </modules>
-
     <packaging>pom</packaging>
 
     <properties>
