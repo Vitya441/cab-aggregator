@@ -10,11 +10,11 @@
 --     firstname       VARCHAR(128)                        NOT NULL,
 --     lastname        VARCHAR(128)                        NOT NULL,
 --     phone           VARCHAR(128)                        NOT NULL,
---     birthdate       DATE,
+--     birthdate       DATE                                NOT NULL,
 --     payment_method  VARCHAR(30)                         NOT NULL,
 --     balance         DECIMAL(6,2),
---     created_utc     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
---     updated_utc     TIMESTAMP                           NULL
+--     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+--     updated_at     TIMESTAMP                           NULL
 --     );
 --
 -- CREATE INDEX IF NOT EXISTS idx_passengers_username ON passenger (username);
