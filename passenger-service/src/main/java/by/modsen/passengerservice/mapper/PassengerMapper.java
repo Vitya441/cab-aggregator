@@ -4,7 +4,7 @@ import by.modsen.passengerservice.dto.PassengerCreateDto;
 import by.modsen.passengerservice.dto.PassengerDto;
 import by.modsen.passengerservice.entity.Passenger;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -18,5 +18,8 @@ public interface PassengerMapper {
     PassengerDto toPassengerDto(Passenger passenger);
 
     List<PassengerDto> toPassengerDtos(List<Passenger> passengers);
+
+    void updatePassengerFromDto(PassengerCreateDto passengerCreateDto, @MappingTarget Passenger passenger);
+
 
 }

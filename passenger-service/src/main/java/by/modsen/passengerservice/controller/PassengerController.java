@@ -1,8 +1,8 @@
 package by.modsen.passengerservice.controller;
 
-import by.modsen.passengerservice.dto.PassengerDto;
 import by.modsen.passengerservice.dto.PassengerCreateDto;
-import by.modsen.passengerservice.service.PassengerService;
+import by.modsen.passengerservice.dto.PassengerDto;
+import by.modsen.passengerservice.service.impl.PassengerServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PassengerController {
 
-    private final PassengerService service;
+    private final PassengerServiceImpl service;
 
     @PostMapping
-    public void create(@RequestBody PassengerCreateDto passengerCreateDto) {
-        service.createPassenger(passengerCreateDto);
+    public PassengerDto create(@RequestBody PassengerCreateDto passengerCreateDto) {
+        return service.createPassenger(passengerCreateDto);
     }
 
     @GetMapping
@@ -25,12 +25,17 @@ public class PassengerController {
         return service.getAllPassengers();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public PassengerDto getById(@PathVariable Long id) {
         return service.getPassengerById(id);
     }
 
-    @DeleteMapping("{id}")
+    @PutMapping({"/{id}"})
+    public PassengerDto update(@PathVariable Long id, @RequestBody PassengerCreateDto passengerCreateDto) {
+        return service.updatePassenger(id, passengerCreateDto);
+    }
+
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.deletePassengerById(id);
     }

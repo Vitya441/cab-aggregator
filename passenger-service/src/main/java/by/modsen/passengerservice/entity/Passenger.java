@@ -33,8 +33,17 @@ public class Passenger {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Embedded
-    private PersonalInfo info;
+    @Column(name = "firstname", nullable = false)
+    private String firstName;
+
+    @Column(name = "lastname", nullable = false)
+    private String lastName;
+
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(name = "birthdate")
+    private String birthDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false)
@@ -43,6 +52,7 @@ public class Passenger {
     @Column
     private BigDecimal balance;
 
+    // Оценки пассажира (водители оценивают после поездки)
     @ElementCollection
     @CollectionTable(name = "passenger_ratings", joinColumns = @JoinColumn(name = "passenger_id"))
     @Column(name = "rating")
@@ -53,11 +63,12 @@ public class Passenger {
     private Instant updatedAt;
 
     @PrePersist
-    protected void onCreate() {
+    private void onCreate() {
         this.createdAt = Instant.now();
     }
 
-    @PreUpdate void onUpdate() {
+    @PreUpdate
+    private void onUpdate() {
         this.updatedAt = Instant.now();
     }
 
