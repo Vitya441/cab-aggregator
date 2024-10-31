@@ -1,26 +1,41 @@
 package by.modsen.passengerservice.entity;
 
 import by.modsen.passengerservice.entity.enums.PaymentMethod;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "passenger")
+@EntityListeners(AuditingEntityListener.class)
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "passenger")
 public class Passenger {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -29,7 +44,6 @@ public class Passenger {
     @Column(nullable = false)
     private String password;
 
-    @Email
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -43,7 +57,7 @@ public class Passenger {
     private String phone;
 
     @Column(name = "birthdate")
-    private String birthDate;
+    private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false)
@@ -52,25 +66,17 @@ public class Passenger {
     @Column
     private BigDecimal balance;
 
-    // Оценки пассажира (водители оценивают после поездки)
     @ElementCollection
     @CollectionTable(name = "passenger_ratings", joinColumns = @JoinColumn(name = "passenger_id"))
     @Column(name = "rating")
     private List<Integer> ratings =  new ArrayList<>();
 
+    @CreatedDate
+    @Column(name = "created_at")
     private Instant createdAt;
 
+    @LastModifiedDate
+    @Column(name = "updated_at")
     private Instant updatedAt;
-
-    @PrePersist
-    private void onCreate() {
-        this.createdAt = Instant.now();
-    }
-
-    @PreUpdate
-    private void onUpdate() {
-        this.updatedAt = Instant.now();
-    }
-
-
 }
+

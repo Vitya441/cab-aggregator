@@ -1,20 +1,19 @@
 package by.modsen.passengerservice.service;
 
+import by.modsen.passengerservice.dto.PaginationDto;
 import by.modsen.passengerservice.dto.PassengerCreateDto;
 import by.modsen.passengerservice.dto.PassengerDto;
-
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface PassengerService {
 
-    PassengerDto createPassenger(PassengerCreateDto passengerCreateDto);
+    PassengerDto create(PassengerCreateDto passengerCreateDto);
 
-    List<PassengerDto> getAllPassengers();
+    PaginationDto<PassengerDto> getAll(Pageable pageable);
 
-    PassengerDto getPassengerById(Long id);
+    PassengerDto getById(long id);
 
-    PassengerDto updatePassenger(Long id, PassengerCreateDto passengerCreateDto);
+    PassengerDto update(long id, PassengerCreateDto passengerCreateDto);
 
-    void deletePassengerById(Long id);
-
+    void deleteById(long id);
 }

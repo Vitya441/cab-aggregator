@@ -2,6 +2,8 @@ package by.modsen.passengerservice.dto;
 
 import by.modsen.passengerservice.entity.enums.PaymentMethod;
 
+import java.time.LocalDate;
+
 public record PassengerCreateDto(
         String username,
         String password,
@@ -9,6 +11,6 @@ public record PassengerCreateDto(
         String firstName,
         String lastName,
         String phone,
-        String birthDate,
+        LocalDate birthDate,
         PaymentMethod preferredPaymentMethod
 ) {}
