@@ -4,6 +4,7 @@ import by.modsen.passengerservice.dto.PaginationDto;
 import by.modsen.passengerservice.dto.PassengerCreateDto;
 import by.modsen.passengerservice.dto.PassengerDto;
 import by.modsen.passengerservice.service.PassengerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -26,7 +27,7 @@ public class PassengerController {
     private final PassengerService service;
 
     @PostMapping
-    public ResponseEntity<PassengerDto> create(@RequestBody PassengerCreateDto passengerCreateDto) {
+    public ResponseEntity<PassengerDto> create(@Valid @RequestBody PassengerCreateDto passengerCreateDto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(service.create(passengerCreateDto));
@@ -43,7 +44,7 @@ public class PassengerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PassengerDto> update(@PathVariable long id, @RequestBody PassengerCreateDto passengerCreateDto) {
+    public ResponseEntity<PassengerDto> update(@PathVariable long id, @Valid @RequestBody PassengerCreateDto passengerCreateDto) {
         return ResponseEntity.ok(service.update(id, passengerCreateDto));
     }
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="4" author="Vitya441">
+        <insert tableName="passenger_ratings">
+            <column name="passenger_id">1</column>
+            <column name="rating">10</column>
+        </insert>
+        <insert tableName="passenger_ratings">
+            <column name="passenger_id">1</column>
+            <column name="rating">7</column>
+        </insert>
+        <insert tableName="passenger_ratings">
+            <column name="passenger_id">2</column>
+            <column name="rating">10</column>
+        </insert>
+        <insert tableName="passenger_ratings">
+            <column name="passenger_id">2</column>
+            <column name="rating">8</column>
+        </insert>
+        <insert tableName="passenger_ratings">
+            <column name="passenger_id">3</column>
+            <column name="rating">10</column>
+        </insert>
+        <insert tableName="passenger_ratings">
+            <column name="passenger_id">3</column>
+            <column name="rating">6</column>
+        </insert>
+    </changeSet>
+
+
+</databaseChangeLog>

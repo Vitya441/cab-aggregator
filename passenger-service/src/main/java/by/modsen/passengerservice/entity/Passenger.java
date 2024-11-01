@@ -38,7 +38,7 @@ public class Passenger {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false)
@@ -53,10 +53,10 @@ public class Passenger {
     @Column(name = "lastname", nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String phone;
 
-    @Column(name = "birthdate")
+    @Column(name = "birthdate", nullable = false)
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
@@ -78,5 +78,9 @@ public class Passenger {
     @LastModifiedDate
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    public Double getAverageRating() {
+        return ratings.isEmpty() ? null : ratings.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+    }
 }
 
