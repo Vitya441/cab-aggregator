@@ -5,16 +5,14 @@ import by.modsen.passengerservice.dto.PassengerCreateDto;
 import by.modsen.passengerservice.dto.PassengerDto;
 import by.modsen.passengerservice.entity.Passenger;
 import by.modsen.passengerservice.exception.PassengerNotFoundException;
-import by.modsen.passengerservice.exception.PassengerWithEmailExistsException;
-import by.modsen.passengerservice.exception.PassengerWithPhoneExistsException;
-import by.modsen.passengerservice.exception.PassengerWithUsernameExistsException;
 import by.modsen.passengerservice.mapper.PassengerMapper;
 import by.modsen.passengerservice.repository.PassengerRepository;
 import by.modsen.passengerservice.service.PassengerService;
 import by.modsen.passengerservice.utils.MessageUtils;
+import by.modsen.passengerservice.utils.PassengerValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,19 +25,20 @@ public class PassengerServiceImpl implements PassengerService {
 
     private final PassengerRepository repository;
     private final PassengerMapper mapper;
-    private final MessageUtils messageUtils;
+    private final PassengerValidator validator;
 
     @Override
     public PassengerDto create(PassengerCreateDto passengerCreateDto) {
-        validatePassengerUniqueness(passengerCreateDto);
+        validator.validateUniqueness(passengerCreateDto);
         Passenger passenger = mapper.toPassenger(passengerCreateDto);
         Passenger savedPassenger = repository.save(passenger);
         return mapper.toPassengerDto(savedPassenger);
     }
 
     @Override
-    public PaginationDto<PassengerDto> getAll(Pageable pageable) {
-        Page<Passenger> page = repository.findAll(pageable);
+    public PaginationDto<PassengerDto> getAll(int pageNumber, int size) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, size);
+        Page<Passenger> page = repository.findAll(pageRequest);
         List<PassengerDto> data = page.getContent().stream()
                 .map(mapper::toPassengerDto)
                 .toList();
@@ -57,7 +56,7 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerDto getById(long id) {
         Passenger passenger = repository
                 .findById(id)
-                .orElseThrow(() -> new PassengerNotFoundException(messageUtils.getMessage("passenger.notFound", id)));
+                .orElseThrow(() -> new PassengerNotFoundException(MessageUtils.PASSENGER_NOT_FOUND_ERROR, id));
         return mapper.toPassengerDto(passenger);
     }
 
@@ -65,10 +64,9 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerDto update(long id, PassengerCreateDto requestDto) {
         Passenger existingPassenger = repository
                 .findById(id)
-                .orElseThrow(() -> new PassengerNotFoundException(messageUtils.getMessage("passenger.notFound")));
+                .orElseThrow(() -> new PassengerNotFoundException(MessageUtils.PASSENGER_NOT_FOUND_ERROR, id));
 
-        validatePassengerUniqueness(requestDto, existingPassenger);
-
+        validator.validateUniqueness(requestDto, existingPassenger);
         mapper.updatePassengerFromDto(requestDto, existingPassenger);
         Passenger savedPassenger = repository.save(existingPassenger);
         return mapper.toPassengerDto(savedPassenger);
@@ -77,26 +75,8 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public void deleteById(long id) {
         if (!repository.existsById(id)) {
-            throw new PassengerNotFoundException(messageUtils.getMessage("passenger.notFound", id));
+            throw new PassengerNotFoundException(MessageUtils.PASSENGER_NOT_FOUND_ERROR, id);
         }
         repository.deleteById(id);
-    }
-
-    private void validatePassengerUniqueness(PassengerCreateDto dto) {
-        if (repository.existsByUsername(dto.username())) throw new PassengerWithUsernameExistsException(messageUtils.getMessage("passenger.usernameExists", dto.username()));
-        if (repository.existsByEmail(dto.email())) throw new PassengerWithEmailExistsException(messageUtils.getMessage("passenger.emailExists", dto.email()));
-        if (repository.existsByPhone(dto.phone())) throw new PassengerWithPhoneExistsException(messageUtils.getMessage("passenger.phoneExists", dto.phone()));
-    }
-
-    private void validatePassengerUniqueness(PassengerCreateDto dto, Passenger existingPassenger) {
-        if (!existingPassenger.getUsername().equals(dto.username()) && repository.existsByUsername(dto.username())) {
-            throw new PassengerWithUsernameExistsException(messageUtils.getMessage("passenger.usernameExists", dto.username()));
-        }
-        if (!existingPassenger.getEmail().equals(dto.email()) && repository.existsByEmail(dto.email())) {
-            throw new PassengerWithEmailExistsException(messageUtils.getMessage("passenger.emailExists", dto.email()));
-        }
-        if (!existingPassenger.getPhone().equals(dto.phone()) && repository.existsByPhone(dto.phone())) {
-            throw new PassengerWithPhoneExistsException(messageUtils.getMessage("passenger.phoneExists", dto.phone()));
-        }
     }
 }

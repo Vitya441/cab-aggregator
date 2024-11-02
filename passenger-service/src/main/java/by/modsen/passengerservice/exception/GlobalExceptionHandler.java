@@ -2,6 +2,8 @@ package by.modsen.passengerservice.exception;
 
 import by.modsen.passengerservice.dto.ErrorResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,37 +16,44 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
+    private final MessageSource exceptionMessageSource;
+    private final MessageSource validationMessageSource;
+
+    @ExceptionHandler({
+            PassengerWithUsernameExistsException.class,
+            PassengerWithEmailExistsException.class,
+            PassengerWithPhoneExistsException.class,
+    })
+    public ResponseEntity<ErrorResponseDto> handlePassengerExistsException(BasicPassengerException e) {
+        String message = getLocalizedMessage(e.getMessage(), e.getArgs());
+        ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.CONFLICT.value(), message);
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(PassengerNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handlePassengerNotFoundException(PassengerNotFoundException e) {
-        ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        String message = getLocalizedMessage(e.getMessage(), e.getArgs());
+        ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), message);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getFieldErrors()
-                .stream()
-                .map(fieldError -> fieldError.getDefaultMessage())
-                .collect(Collectors.joining(", "));
+        String errorMessage = collectErrorMessages(ex);
         ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), errorMessage);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(PassengerWithUsernameExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handlePassengerUsernameExistsException(PassengerWithUsernameExistsException e) {
-        ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.CONFLICT.value(), e.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    private String getLocalizedMessage(String key, Object... args) {
+        return exceptionMessageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }
 
-    @ExceptionHandler(PassengerWithEmailExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handlePassengerEmailExistsException(PassengerWithEmailExistsException e) {
-        ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.CONFLICT.value(), e.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-    }
-
-    @ExceptionHandler(PassengerWithPhoneExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handlePassengerPhoneExistsException(PassengerWithPhoneExistsException e) {
-        ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.CONFLICT.value(), e.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    private String collectErrorMessages(MethodArgumentNotValidException ex) {
+        return ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(fieldError -> validationMessageSource.getMessage(
+                        fieldError.getDefaultMessage(), null, LocaleContextHolder.getLocale()))
+                .collect(Collectors.joining(", "));
     }
 }

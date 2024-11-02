@@ -80,7 +80,7 @@ public class Passenger {
     private Instant updatedAt;
 
     public Double getAverageRating() {
-        return ratings.isEmpty() ? null : ratings.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        return ratings.isEmpty() ? null : ratings.stream().mapToInt(Integer::intValue).average().orElse(0);
     }
 }
 

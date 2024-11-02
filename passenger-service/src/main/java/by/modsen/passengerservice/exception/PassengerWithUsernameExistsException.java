@@ -1,7 +1,11 @@
 package by.modsen.passengerservice.exception;
 
-public class PassengerWithUsernameExistsException extends RuntimeException {
-    public PassengerWithUsernameExistsException(String message) {
-        super(message);
+import lombok.Getter;
+
+@Getter
+public class PassengerWithUsernameExistsException extends BasicPassengerException {
+
+    public PassengerWithUsernameExistsException(String message, Object ... args) {
+        super(message, args);
     }
 }

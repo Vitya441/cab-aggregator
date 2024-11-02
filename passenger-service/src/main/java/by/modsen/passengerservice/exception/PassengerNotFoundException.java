@@ -1,7 +1,11 @@
 package by.modsen.passengerservice.exception;
 
-public class PassengerNotFoundException extends RuntimeException {
-    public PassengerNotFoundException(String message) {
-        super(message);
+import lombok.Getter;
+
+@Getter
+public class PassengerNotFoundException extends BasicPassengerException {
+
+    public PassengerNotFoundException(String message, Object... args) {
+        super(message, args);
     }
 }

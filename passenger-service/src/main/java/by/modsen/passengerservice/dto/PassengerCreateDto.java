@@ -8,27 +8,39 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
+import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_EMAIL_INVALID;
+import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_EMAIL_NOT_EMPTY;
+import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_FIRSTNAME_NOT_EMPTY;
+import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_LASTNAME_NOT_EMPTY;
+import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_PASSWORD_MIN_SIZE;
+import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_PASSWORD_NOT_EMPTY;
+import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_PHONE_INVALID_FORMAT;
+import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_PHONE_NOT_EMPTY;
+import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_USERNAME_NOT_EMPTY;
+import static by.modsen.passengerservice.utils.PatternUtils.REGEX_EMAIL;
+import static by.modsen.passengerservice.utils.PatternUtils.REGEX_PHONE;
+
 public record PassengerCreateDto(
-        @NotBlank(message = "Username cannot be blank")
+        @NotBlank(message = VALIDATION_USERNAME_NOT_EMPTY)
         String username,
 
-        @NotBlank(message = "Email cannot be empty")
-        @Email(message = "Email should be valid", regexp = "^(.+)@(\\S+)$")
+        @NotBlank(message = VALIDATION_EMAIL_NOT_EMPTY)
+        @Email(message = VALIDATION_EMAIL_INVALID, regexp = REGEX_EMAIL)
         String email,
 
-        @NotBlank(message = "Password cannot be empty")
-        @Size(min = 8, message = "Minimum 8 symbols in password is required")
+        @NotBlank(message = VALIDATION_PASSWORD_NOT_EMPTY)
+        @Size(min = 8, message = VALIDATION_PASSWORD_MIN_SIZE)
         String password,
 
-        @NotBlank(message = "Firstname cannot be empty")
+        @NotBlank(message = VALIDATION_FIRSTNAME_NOT_EMPTY)
         String firstName,
 
-        @NotBlank(message = "Lastname cannot be empty")
+        @NotBlank(message = VALIDATION_LASTNAME_NOT_EMPTY)
         String lastName,
 
-        @NotBlank(message = "Phone cannot be empty")
-        @Pattern(regexp = "^\\+\\d+$",
-                message = "Invalid phone number format")
+        @NotBlank(message = VALIDATION_PHONE_NOT_EMPTY)
+        @Pattern(regexp = REGEX_PHONE,
+                message = VALIDATION_PHONE_INVALID_FORMAT)
         String phone,
 
         LocalDate birthDate,
