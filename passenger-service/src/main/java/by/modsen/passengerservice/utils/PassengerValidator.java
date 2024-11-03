@@ -16,26 +16,38 @@ public class PassengerValidator {
     private final PassengerRepository repository;
 
     public void validateUniqueness(PassengerCreateDto dto) {
-        if (repository.existsByUsername(dto.username())) {
-            throw new PassengerWithUsernameExistsException(MessageUtils.PASSENGER_USERNAME_EXIST_ERROR, dto.username());
+        validateUsernameUniqueness(dto.username());
+        validateEmailUniqueness(dto.email());
+        validatePhoneUniqueness(dto.phone());
+    }
+
+    public void validateUniqueness(PassengerCreateDto dto, Passenger currentPassenger) {
+        if (!currentPassenger.getUsername().equals(dto.username())) {
+            validateUsernameUniqueness(dto.username());
         }
-        if (repository.existsByEmail(dto.email())) {
-            throw new PassengerWithEmailExistsException(MessageUtils.PASSENGER_EMAIL_EXIST_ERROR, dto.email());
+        if (!currentPassenger.getEmail().equals(dto.email())) {
+            validateEmailUniqueness(dto.email());
         }
-        if (repository.existsByPhone(dto.phone())) {
-            throw new PassengerWithPhoneExistsException(MessageUtils.PASSENGER_PHONE_EXIST_ERROR, dto.phone());
+        if (!currentPassenger.getPhone().equals(dto.phone())) {
+            validatePhoneUniqueness(dto.phone());
         }
     }
 
-    public void validateUniqueness(PassengerCreateDto dto, Passenger existingPassenger) {
-        if (!existingPassenger.getUsername().equals(dto.username()) && repository.existsByUsername(dto.username())) {
-            throw new PassengerWithUsernameExistsException(MessageUtils.PASSENGER_USERNAME_EXIST_ERROR, dto.username());
+    private void validateUsernameUniqueness(String username) {
+        if (repository.existsByUsername(username)) {
+            throw new PassengerWithUsernameExistsException(MessageUtils.PASSENGER_USERNAME_EXIST_ERROR, username);
         }
-        if (!existingPassenger.getEmail().equals(dto.email()) && repository.existsByEmail(dto.email())) {
-            throw new PassengerWithEmailExistsException(MessageUtils.PASSENGER_EMAIL_EXIST_ERROR, dto.email());
+    }
+
+    private void validateEmailUniqueness(String email) {
+        if (repository.existsByEmail(email)) {
+            throw new PassengerWithEmailExistsException(MessageUtils.PASSENGER_EMAIL_EXIST_ERROR, email);
         }
-        if (!existingPassenger.getPhone().equals(dto.phone()) && repository.existsByPhone(dto.phone())) {
-            throw new PassengerWithPhoneExistsException(MessageUtils.PASSENGER_PHONE_EXIST_ERROR, dto.phone());
+    }
+
+    private void validatePhoneUniqueness(String phone) {
+        if (repository.existsByPhone(phone)) {
+            throw new PassengerWithPhoneExistsException(MessageUtils.PASSENGER_PHONE_EXIST_ERROR, phone);
         }
     }
 }

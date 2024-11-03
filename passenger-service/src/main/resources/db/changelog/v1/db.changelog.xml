@@ -5,6 +5,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="db/changelog/v1/db.changelog.xml"/>
+    <include file="v1-create-passenger-table.xml" relativeToChangelogFile="true"/>
+    <include file="v1-create-passenger-ratings-table.xml" relativeToChangelogFile="true"/>
+    <include file="v1-fill-passenger-table.xml" relativeToChangelogFile="true"/>
+    <include file="v1-fill-passenger-ratings-table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

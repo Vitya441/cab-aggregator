@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="2" author="Vitya441">
+    <changeSet id="2024-11-03:passenger-ratings-init" author="Vitya441">
         <createTable tableName="passenger_ratings">
             <column name="passenger_id" type="BIGINT">
                 <constraints nullable="false"/>
@@ -19,8 +19,11 @@
                 referencedTableName="passenger"
                 referencedColumnNames="id"
                 constraintName="fk_passenger_ratings_passenger"/>
+
+        <rollback>
+            <dropTable tableName="passenger_ratings"/>
+        </rollback>
+
     </changeSet>
-
-
 
 </databaseChangeLog>

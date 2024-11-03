@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="1" author="Vitya441">
+    <changeSet id="2024-11-03:passenger-table-init" author="Vitya441">
 
         <createTable tableName="passenger">
             <column name="id" type="BIGINT" autoIncrement="true">
@@ -45,7 +45,11 @@
         <createIndex indexName="idx_passengers_username" tableName="passenger">
             <column name="username"/>
         </createIndex>
-    </changeSet>
 
+        <rollback>
+            <dropTable tableName="passenger"/>
+        </rollback>
+
+    </changeSet>
 
 </databaseChangeLog>

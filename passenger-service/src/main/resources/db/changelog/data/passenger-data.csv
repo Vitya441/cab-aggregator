@@ -1,0 +1,6 @@
+username,email,password,firstname,lastname,phone,birthdate,payment_method,balance
+sergey,sergey@mail.ru,11111111,Sergey,Ermochenko,+12345678,2000-01-01,CASH,3000
+anna,anna@mail.ru,22222222,Anna,Petrova,+87654321,1995-03-15,CREDIT_CARD,4500
+ivan,ivan@mail.ru,33333333,Ivan,Ivanov,+23456789,1988-07-22,CASH,1200
+maria,maria@mail.ru,44444444,Maria,Sidorova,+98765432,1992-11-05,CREDIT_CARD,2300
+oleg,oleg@mail.ru,55555555,Oleg,Kuznetsov,+34567890,1985-04-30,CASH,3200

@@ -62,13 +62,13 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     public PassengerDto update(long id, PassengerCreateDto requestDto) {
-        Passenger existingPassenger = repository
+        Passenger currentPassenger = repository
                 .findById(id)
                 .orElseThrow(() -> new PassengerNotFoundException(MessageUtils.PASSENGER_NOT_FOUND_ERROR, id));
 
-        validator.validateUniqueness(requestDto, existingPassenger);
-        mapper.updatePassengerFromDto(requestDto, existingPassenger);
-        Passenger savedPassenger = repository.save(existingPassenger);
+        validator.validateUniqueness(requestDto, currentPassenger);
+        mapper.updatePassengerFromDto(requestDto, currentPassenger);
+        Passenger savedPassenger = repository.save(currentPassenger);
         return mapper.toPassengerDto(savedPassenger);
     }
 
