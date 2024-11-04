@@ -20,10 +20,6 @@
                 referencedColumnNames="id"
                 constraintName="fk_passenger_ratings_passenger"/>
 
-        <rollback>
-            <dropTable tableName="passenger_ratings"/>
-        </rollback>
-
     </changeSet>
 
 </databaseChangeLog>

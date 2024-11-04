@@ -1,6 +1,7 @@
 package by.modsen.passengerservice.utils;
 
-import by.modsen.passengerservice.dto.PassengerCreateDto;
+import by.modsen.passengerservice.dto.request.PassengerCreateDto;
+import by.modsen.passengerservice.dto.request.PassengerUpdateDto;
 import by.modsen.passengerservice.entity.Passenger;
 import by.modsen.passengerservice.exception.PassengerWithEmailExistsException;
 import by.modsen.passengerservice.exception.PassengerWithPhoneExistsException;
@@ -21,7 +22,7 @@ public class PassengerValidator {
         validatePhoneUniqueness(dto.phone());
     }
 
-    public void validateUniqueness(PassengerCreateDto dto, Passenger currentPassenger) {
+    public void validateUniqueness(PassengerUpdateDto dto, Passenger currentPassenger) {
         if (!currentPassenger.getUsername().equals(dto.username())) {
             validateUsernameUniqueness(dto.username());
         }

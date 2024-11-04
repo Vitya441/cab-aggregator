@@ -1,6 +1,7 @@
 package by.modsen.passengerservice.exception;
 
-import by.modsen.passengerservice.dto.ErrorResponseDto;
+import by.modsen.passengerservice.dto.response.ErrorResponseDto;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     private final MessageSource exceptionMessageSource;
-    private final MessageSource validationMessageSource;
 
     @ExceptionHandler({
             PassengerWithUsernameExistsException.class,
@@ -40,9 +40,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        String errorMessage = collectErrorMessages(ex);
-        ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), errorMessage);
+        String message = collectErrorMessages(ex);
+        ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), message);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDto> handleConstraintViolationExceptions(ConstraintViolationException ex) {
+       String message = collectErrorMessagesFromViolations(ex);
+       ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), message);
+       return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     private String getLocalizedMessage(String key, Object... args) {
@@ -50,10 +57,14 @@ public class GlobalExceptionHandler {
     }
 
     private String collectErrorMessages(MethodArgumentNotValidException ex) {
-        return ex.getBindingResult().getFieldErrors()
-                .stream()
-                .map(fieldError -> validationMessageSource.getMessage(
-                        fieldError.getDefaultMessage(), null, LocaleContextHolder.getLocale()))
+        return ex.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> getLocalizedMessage(fieldError.getDefaultMessage()))
+                .collect(Collectors.joining(", "));
+    }
+
+    private String collectErrorMessagesFromViolations(ConstraintViolationException ex) {
+        return ex.getConstraintViolations().stream()
+                .map(violation -> getLocalizedMessage(violation.getMessage()))
                 .collect(Collectors.joining(", "));
     }
 }

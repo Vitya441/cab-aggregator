@@ -10,4 +10,8 @@
     <include file="v1-fill-passenger-table.xml" relativeToChangelogFile="true"/>
     <include file="v1-fill-passenger-ratings-table.xml" relativeToChangelogFile="true"/>
 
+    <changeSet id="stable-db" author="Vitya441">
+        <tagDatabase tag="v1"/>
+    </changeSet>
+
 </databaseChangeLog>

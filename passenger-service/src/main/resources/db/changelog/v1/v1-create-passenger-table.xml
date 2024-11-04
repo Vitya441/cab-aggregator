@@ -46,10 +46,6 @@
             <column name="username"/>
         </createIndex>
 
-        <rollback>
-            <dropTable tableName="passenger"/>
-        </rollback>
-
     </changeSet>
 
 </databaseChangeLog>

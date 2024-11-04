@@ -1,8 +1,9 @@
-package by.modsen.passengerservice.dto;
+package by.modsen.passengerservice.dto.request;
 
 import by.modsen.passengerservice.entity.enums.PaymentMethod;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -20,7 +21,7 @@ import static by.modsen.passengerservice.utils.MessageUtils.VALIDATION_USERNAME_
 import static by.modsen.passengerservice.utils.PatternUtils.REGEX_EMAIL;
 import static by.modsen.passengerservice.utils.PatternUtils.REGEX_PHONE;
 
-public record PassengerCreateDto(
+public record PassengerUpdateDto(
         @NotBlank(message = VALIDATION_USERNAME_NOT_EMPTY)
         String username,
 
@@ -43,7 +44,9 @@ public record PassengerCreateDto(
                 message = VALIDATION_PHONE_INVALID_FORMAT)
         String phone,
 
+        @NotNull
         LocalDate birthDate,
 
+        @NotNull
         PaymentMethod preferredPaymentMethod
 ) {}

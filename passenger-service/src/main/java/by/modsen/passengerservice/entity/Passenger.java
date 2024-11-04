@@ -83,4 +83,3 @@ public class Passenger {
         return ratings.isEmpty() ? null : ratings.stream().mapToInt(Integer::intValue).average().orElse(0);
     }
 }
-

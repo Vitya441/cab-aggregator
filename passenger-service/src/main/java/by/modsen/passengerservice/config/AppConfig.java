@@ -15,15 +15,7 @@ public class AppConfig {
     @Bean
     public MessageSource exceptionMessageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:exception");
-        messageSource.setDefaultEncoding("ISO-8859-1");
-        return messageSource;
-    }
-
-    @Bean
-    public MessageSource validationMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:validation");
+        messageSource.setBasenames("classpath:exception", "classpath:validation");
         messageSource.setDefaultEncoding("ISO-8859-1");
         return messageSource;
     }

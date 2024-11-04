@@ -1,8 +1,9 @@
 package by.modsen.passengerservice.service.impl;
 
-import by.modsen.passengerservice.dto.PaginationDto;
-import by.modsen.passengerservice.dto.PassengerCreateDto;
-import by.modsen.passengerservice.dto.PassengerDto;
+import by.modsen.passengerservice.dto.request.PassengerUpdateDto;
+import by.modsen.passengerservice.dto.response.PaginationDto;
+import by.modsen.passengerservice.dto.request.PassengerCreateDto;
+import by.modsen.passengerservice.dto.response.PassengerDto;
 import by.modsen.passengerservice.entity.Passenger;
 import by.modsen.passengerservice.exception.PassengerNotFoundException;
 import by.modsen.passengerservice.mapper.PassengerMapper;
@@ -36,8 +37,8 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public PaginationDto<PassengerDto> getAll(int pageNumber, int size) {
-        PageRequest pageRequest = PageRequest.of(pageNumber, size);
+    public PaginationDto<PassengerDto> getAll(int pageNumber, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         Page<Passenger> page = repository.findAll(pageRequest);
         List<PassengerDto> data = page.getContent().stream()
                 .map(mapper::toPassengerDto)
@@ -54,29 +55,28 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     public PassengerDto getById(long id) {
-        Passenger passenger = repository
-                .findById(id)
-                .orElseThrow(() -> new PassengerNotFoundException(MessageUtils.PASSENGER_NOT_FOUND_ERROR, id));
+        Passenger passenger = getOrThrow(id);
         return mapper.toPassengerDto(passenger);
     }
 
     @Override
-    public PassengerDto update(long id, PassengerCreateDto requestDto) {
-        Passenger currentPassenger = repository
-                .findById(id)
-                .orElseThrow(() -> new PassengerNotFoundException(MessageUtils.PASSENGER_NOT_FOUND_ERROR, id));
-
-        validator.validateUniqueness(requestDto, currentPassenger);
-        mapper.updatePassengerFromDto(requestDto, currentPassenger);
+    public PassengerDto update(long id, PassengerUpdateDto passengerUpdateDto) {
+        Passenger currentPassenger = getOrThrow(id);
+        validator.validateUniqueness(passengerUpdateDto, currentPassenger);
+        mapper.updatePassengerFromDto(passengerUpdateDto, currentPassenger);
         Passenger savedPassenger = repository.save(currentPassenger);
         return mapper.toPassengerDto(savedPassenger);
     }
 
     @Override
     public void deleteById(long id) {
-        if (!repository.existsById(id)) {
-            throw new PassengerNotFoundException(MessageUtils.PASSENGER_NOT_FOUND_ERROR, id);
-        }
+        getOrThrow(id);
         repository.deleteById(id);
+    }
+
+    private Passenger getOrThrow(long id) {
+        return repository
+                .findById(id)
+                .orElseThrow(() -> new PassengerNotFoundException(MessageUtils.PASSENGER_NOT_FOUND_ERROR, id));
     }
 }

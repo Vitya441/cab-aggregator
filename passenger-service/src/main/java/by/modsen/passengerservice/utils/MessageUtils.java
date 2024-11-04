@@ -19,4 +19,7 @@ public class MessageUtils {
     public static final String VALIDATION_EMAIL_INVALID = "email.invalid";
     public static final String VALIDATION_PASSWORD_MIN_SIZE = "password.minSize";
     public static final String VALIDATION_PHONE_INVALID_FORMAT = "phone.invalidFormat";
+
+    public static final String VALIDATION_PAGE_NUMBER = "pageNumber.invalid";
+    public static final String VALIDATION_PAGE_SIZE = "pageSize.invalid";
 }
