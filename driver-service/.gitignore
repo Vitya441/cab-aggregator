@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Other trash ###
+.mvn
+mvnw
+mvnw.cmd
+.gitattributes
+
