@@ -8,29 +8,20 @@
     <changeSet id="2024-11-04:driver-init" author="Vitya441">
 
         <createTable tableName="driver">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="car_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="username" type="varchar">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="email" type="varchar">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="password" type="varchar">
-                <constraints nullable="false"/>
-            </column>
-            <column name="phone" type="varchar">
-                <constraints nullable="false" unique="true"/>
+                <constraints unique="true"/>
             </column>
             <column name="first_name" type="varchar">
                 <constraints nullable="false"/>
             </column>
             <column name="last_name" type="varchar">
                 <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="varchar">
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="status" type="varchar">
                 <constraints nullable="false"/>
@@ -43,7 +34,8 @@
                                  baseColumnNames="car_id"
                                  referencedTableName="car"
                                  referencedColumnNames="id"
-                                 constraintName="fk_driver_car"/>
+                                 constraintName="fk_driver_car"
+                                 onDelete="SET NULL"/>
 
 
 

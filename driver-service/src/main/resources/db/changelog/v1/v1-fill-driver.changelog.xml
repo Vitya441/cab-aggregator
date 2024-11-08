@@ -5,9 +5,12 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="v1-car-table.xml" relativeToChangelogFile="true"/>
-    <include file="v1-driver-table.xml" relativeToChangelogFile="true"/>
-    <include file="v1-fill-car.changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v1-fill-driver.changelog.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="13-11-2024:fill-driver" author="Vitya441">
+        <loadData tableName="driver" file="db/changelog/data/driver-data.csv"/>
+        <rollback>
+            <delete tableName="driver"/>
+        </rollback>
+    </changeSet>
 
 </databaseChangeLog>

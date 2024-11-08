@@ -27,9 +27,10 @@
 
     <properties>
         <lombok.version>1.18.34</lombok.version>
+        <liquibase.version>4.27.0</liquibase.version>
+        <mapstruct.version>1.6.0</mapstruct.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <springdoc.version>2.6.0</springdoc.version>
-        <mapstruct.version>1.6.0</mapstruct.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

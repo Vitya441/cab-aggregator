@@ -8,7 +8,7 @@
     <changeSet id="2024-11-05:car-init" author="Vitya441">
 
         <createTable tableName="car">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="license_number" type="varchar">
@@ -22,7 +22,6 @@
             </column>
             <column name="created_at" type="timestamp"/>
             <column name="updated_at" type="timestamp"/>
-
         </createTable>
 
     </changeSet>
