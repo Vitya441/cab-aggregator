@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:latest
+    volumes:
+      - ./volume-data/my-keycloak-data:/var/lib/postgresql
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: my_admin
+      POSTGRES_PASSWORD: my_password
+      POSTGRES_DB: keycloak_db
+    ports:
+      - "5433:5432"
+
+  # version docker images should be equals maven dependency keycloak-admin
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.2
+    command: [ "start-dev", "--import-realm" ]
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_SCHEMA: public
+      DB_DATABASE: keycloak_db
+      DB_USER: my_admin
+      DB_PASSWORD: my_password
+      KEYCLOAK_ADMIN: kc_admin
+      KEYCLOAK_ADMIN_PASSWORD: kc_password
+    ports:
+      - "9090:8080"
+    volumes:
+      - ./docker/keycloak/realms/:/opt/keycloak/data/import/
+    depends_on:
+      - postgres
+
