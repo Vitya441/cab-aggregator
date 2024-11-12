@@ -22,10 +22,8 @@ public class TestApi {
         return ResponseEntity.ok("Hello Passenger!");
     }
 
-
     @GetMapping("/driver-role")
     public ResponseEntity<?> testForDriverRole() {
         return ResponseEntity.ok("Hello driver!");
     }
-
 }

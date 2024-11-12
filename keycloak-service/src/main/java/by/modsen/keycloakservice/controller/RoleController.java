@@ -28,9 +28,4 @@ public class RoleController {
         roleService.deleteFromUser(userId, roleName);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
-
 }

@@ -1,13 +1,13 @@
 package by.modsen.keycloakservice.service;
 
-import by.modsen.keycloakservice.dto.LoginRequestDto;
+import by.modsen.keycloakservice.dto.LoginRequest;
 import by.modsen.keycloakservice.dto.NewUserDto;
+import by.modsen.keycloakservice.dto.UserRole;
 import org.keycloak.representations.AccessTokenResponse;
 
 public interface UserRegistrationService {
 
-    AccessTokenResponse getJwt(LoginRequestDto authRequest);
+    AccessTokenResponse getJwt(LoginRequest loginRequest);
 
-    void registerUser(NewUserDto newUserDto);
-
+    void registerUser(NewUserDto newUserDto, UserRole userRole);
 }

@@ -27,6 +27,4 @@ public class GroupController {
         groupService.deleteGroupFromUser(userId, groupId);
         return ResponseEntity.noContent().build();
     }
-
-
 }

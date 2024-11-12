@@ -14,7 +14,6 @@ services:
     ports:
       - "5433:5432"
 
-  # version docker images should be equals maven dependency keycloak-admin
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.2
     command: [ "start-dev", "--import-realm" ]
@@ -33,4 +32,3 @@ services:
       - ./docker/keycloak/realms/:/opt/keycloak/data/import/
     depends_on:
       - postgres
-

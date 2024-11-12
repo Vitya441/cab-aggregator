@@ -1,6 +1,6 @@
 package by.modsen.keycloakservice.dto;
 
-public record LoginRequestDto(
+public record LoginRequest(
         String username,
         String password
 ) {}

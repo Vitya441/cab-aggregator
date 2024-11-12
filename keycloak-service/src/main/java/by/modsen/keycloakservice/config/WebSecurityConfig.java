@@ -1,5 +1,6 @@
 package by.modsen.keycloakservice.config;
 
+import by.modsen.keycloakservice.dto.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,15 +51,11 @@ public class WebSecurityConfig {
             http
                 .authorizeHttpRequests(r -> r
                         .requestMatchers("/public/auth/**").permitAll()
-                        .requestMatchers("/test/passenger-role").hasRole("PASSENGER")
-                        .requestMatchers("/test/driver-role").hasRole("DRIVER")
+                        .requestMatchers("/test/passenger-role").hasRole(UserRole.PASSENGER.name())
+                        .requestMatchers("/test/driver-role").hasRole(UserRole.DRIVER.name())
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)));
         return http.build();
     }
-
-
-
-
 }

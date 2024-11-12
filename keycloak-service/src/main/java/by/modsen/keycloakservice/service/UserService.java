@@ -13,12 +13,9 @@ public interface UserService {
 
     void deleteUser(String userId);
 
-    void forgotPassword(String username);
-
     UserResource getUser(String userId);
 
     List<RoleRepresentation> getUserRoles(String userId);
 
     List<GroupRepresentation> getUserGroups(String userId);
-
 }

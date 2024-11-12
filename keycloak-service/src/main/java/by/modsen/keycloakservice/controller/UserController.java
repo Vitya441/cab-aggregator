@@ -41,9 +41,4 @@ public class UserController {
     public ResponseEntity<?> getUserGroups(@PathVariable String id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserGroups(id));
     }
-
-
-
-
-
 }

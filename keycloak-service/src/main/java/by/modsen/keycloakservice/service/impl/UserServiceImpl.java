@@ -3,7 +3,6 @@ package by.modsen.keycloakservice.service.impl;
 import by.modsen.keycloakservice.dto.NewUserDto;
 import by.modsen.keycloakservice.service.UserService;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
@@ -13,45 +12,36 @@ import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    @Value("${app.keycloak.realm}")
-    private String realm;
+    private final String realm;
 
     private final Keycloak keycloak;
 
+    public UserServiceImpl(@Value("${app.keycloak.realm}") String realm, Keycloak keycloak) {
+        this.realm = realm;
+        this.keycloak = keycloak;
+    }
 
     @Override
     public String createUser(NewUserDto newUserDto) {
-        UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setEnabled(true);
-        userRepresentation.setFirstName(newUserDto.firstName());
-        userRepresentation.setLastName(newUserDto.lastName());
-        userRepresentation.setUsername(newUserDto.username());
-        userRepresentation.setEmail(newUserDto.email());
-        userRepresentation.setEmailVerified(true);
-
-        CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
-        credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
-        credentialRepresentation.setValue(newUserDto.password());
-        userRepresentation.setCredentials(List.of(credentialRepresentation));
-
+        UserRepresentation userRepresentation = createUserRepresentation(newUserDto);
         UsersResource usersResource = getUsersResource();
         Response response = usersResource.create(userRepresentation);
-
-        if (response.getStatus() != 201) {
+        if (response.getStatus() != HttpStatus.CREATED.value()) {
             throw new RuntimeException("Failed to create user: Status code = " + response.getStatus());
         }
-
-        String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
+        String userId = extractUserIdFromLocation(response.getLocation());
         log.info("User created with ID: {}", userId);
+
         return userId;
     }
 
@@ -59,15 +49,6 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(String userId) {
         UsersResource usersResource = getUsersResource();
         usersResource.delete(userId);
-    }
-
-    @Override
-    public void forgotPassword(String username) {
-//        UsersResource usersResource = getUsersResource();
-//        List<UserRepresentation> userRepresentations = usersResource.searchByUsername(username, true);
-//        UserRepresentation userRepresentation1 = userRepresentations.get(0);
-//        UserResource userResource = usersResource.get(userRepresentation1.getId());
-//        userResource.executeActionsEmail(List.of("UPDATE_PASSWORD"));
     }
 
     @Override
@@ -87,8 +68,29 @@ public class UserServiceImpl implements UserService {
         return getUser(userId).groups();
     }
 
+    private UserRepresentation createUserRepresentation(NewUserDto newUserDto) {
+        UserRepresentation userRepresentation = new UserRepresentation();
+        userRepresentation.setEnabled(true);
+        userRepresentation.setFirstName(newUserDto.firstName());
+        userRepresentation.setLastName(newUserDto.lastName());
+        userRepresentation.setUsername(newUserDto.username());
+        userRepresentation.setEmail(newUserDto.email());
+        userRepresentation.setEmailVerified(true);
+
+        CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+        credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
+        credentialRepresentation.setValue(newUserDto.password());
+        userRepresentation.setCredentials(List.of(credentialRepresentation));
+
+        return userRepresentation;
+    }
+
     private UsersResource getUsersResource() {
         return keycloak.realm(realm).users();
     }
 
+    private String extractUserIdFromLocation(URI location) {
+        String path = location.getPath();
+        return path.substring(path.lastIndexOf('/') + 1);
+    }
 }

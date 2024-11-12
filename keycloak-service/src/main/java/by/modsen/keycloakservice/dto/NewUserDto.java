@@ -5,6 +5,5 @@ public record NewUserDto(
         String email,
         String password,
         String firstName,
-        String lastName,
-        UserRole userRole
+        String lastName
 ) {}

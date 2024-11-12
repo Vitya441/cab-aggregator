@@ -9,20 +9,28 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class KeycloakConfig {
 
-    @Value("${app.keycloak.admin.clientId}")
-    private String adminClientId;
+    private final String adminClientId;
 
-    @Value("${app.keycloak.user.clientId}")
-    private String userClientId;
+    private final String userClientId;
 
-    @Value("${app.keycloak.admin.clientSecret}")
-    private String clientSecret;
+    private final String clientSecret;
 
-    @Value("${app.keycloak.realm}")
-    private String realm;
+    private final String realm;
 
-    @Value("${app.keycloak.serverUrl}")
-    private String serverUrl;
+    private final String serverUrl;
+
+    public KeycloakConfig(
+            @Value("${app.keycloak.admin.clientId}") String adminClientId,
+            @Value("${app.keycloak.user.clientId}") String userClientId,
+            @Value("${app.keycloak.admin.clientSecret}") String clientSecret,
+            @Value("${app.keycloak.realm}") String realm,
+            @Value("${app.keycloak.serverUrl}") String serverUrl) {
+        this.adminClientId = adminClientId;
+        this.userClientId = userClientId;
+        this.clientSecret = clientSecret;
+        this.realm = realm;
+        this.serverUrl = serverUrl;
+    }
 
     @Bean
     public Keycloak keycloak() {
@@ -45,6 +53,4 @@ public class KeycloakConfig {
                 .password(password)
                 .build();
     }
-
-
 }
