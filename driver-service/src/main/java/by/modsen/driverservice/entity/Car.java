@@ -38,6 +38,15 @@ public class Car {
     @Column(name = "license_number", nullable = false)
     private String licenseNumber;
 
+    @Column(name = "color", nullable = false)
+    private String color;
+
+    @Column(name = "seats", nullable = false)
+    private int seats;
+
+    @Column(name = "brand", nullable = false)
+    private String brand;
+
     @Column(name = "model", nullable = false)
     private String model;
 

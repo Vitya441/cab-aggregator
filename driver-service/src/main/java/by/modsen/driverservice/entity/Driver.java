@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,7 @@ public class Driver {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "car_id", referencedColumnName = "id")
+    @JoinColumn(name = "car_id", referencedColumnName = "id", unique = true)
     private Car car;
 
     @Column(name = "first_name", nullable = false)
@@ -57,4 +58,9 @@ public class Driver {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private Instant updatedAt;
+
+    @PrePersist
+    private void prePersist() {
+        status = DriverStatus.AVAILABLE;
+    }
 }

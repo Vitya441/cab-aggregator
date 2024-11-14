@@ -14,6 +14,15 @@
             <column name="license_number" type="varchar">
                 <constraints unique="true" nullable="false"/>
             </column>
+            <column name="color" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seats" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="brand" type="varchar">
+                <constraints nullable="false"/>
+            </column>
             <column name="model" type="varchar">
                 <constraints nullable="false"/>
             </column>
