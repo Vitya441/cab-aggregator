@@ -1,0 +1,22 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: keycloak-service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${app.keycloak.serverUrl}/realms/${app.keycloak.realm}
+
+app:
+  keycloak:
+    admin:
+      clientId: admin-cli
+      clientSecret: ${KEYCLOAK_SECRET:test}
+    user:
+      clientId: spring-security
+    realm: test-realm
+    serverUrl: http://localhost:9090
