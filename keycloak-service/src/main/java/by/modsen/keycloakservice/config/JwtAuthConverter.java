@@ -25,8 +25,9 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     private static final String REALM_ACCESS_CLAIM = "realm_access";
-
     private static final String RESOURCE_ACCESS_CLAIM = "resource_access";
+    private static final String ROLES_KEY = "roles";
+    private static final String ACCOUNT_KEY = "account";
 
     public JwtAuthConverter() {
         this.jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
@@ -54,8 +55,11 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
         Map<String, Object> resourceAccess = jwt.getClaim(RESOURCE_ACCESS_CLAIM);
 
         Collection<String> allRoles = new ArrayList<>();
-        allRoles.addAll(getRealmRoles(realmAccess));
-        allRoles.addAll(getResourceRoles(resourceAccess));
+        Collection<String> realmRoles = getRealmRoles(realmAccess);
+        Collection<String> resourceRoles = getResourceRoles(resourceAccess);
+
+        allRoles.addAll(realmRoles);
+        allRoles.addAll(resourceRoles);
 
         log.info("Extracted roles: " + allRoles);
 
@@ -65,17 +69,17 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     }
 
     private Collection<String> getRealmRoles(Map<String, Object> realmAccess) {
-        if (realmAccess != null && realmAccess.containsKey("roles")) {
-            return (Collection<String>) realmAccess.get("roles");
+        if (realmAccess != null && realmAccess.containsKey(ROLES_KEY)) {
+            return (Collection<String>) realmAccess.get(ROLES_KEY);
         }
         return Collections.emptyList();
     }
 
     private Collection<String> getResourceRoles(Map<String, Object> resourceAccess) {
-        if (resourceAccess != null && resourceAccess.get("account") != null) {
-            Map<String, Object> account = (Map<String, Object>) resourceAccess.get("account");
-            if (account.containsKey("roles")) {
-                return (Collection<String>) account.get("roles");
+        if (resourceAccess != null && resourceAccess.get(ACCOUNT_KEY) != null) {
+            Map<String, Object> account = (Map<String, Object>) resourceAccess.get(ACCOUNT_KEY);
+            if (account.containsKey(ROLES_KEY)) {
+                return (Collection<String>) account.get(ROLES_KEY);
             }
         }
         return Collections.emptyList();

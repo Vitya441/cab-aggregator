@@ -20,11 +20,16 @@ public class KeycloakConfig {
     private final String serverUrl;
 
     public KeycloakConfig(
-            @Value("${app.keycloak.admin.clientId}") String adminClientId,
-            @Value("${app.keycloak.user.clientId}") String userClientId,
-            @Value("${app.keycloak.admin.clientSecret}") String clientSecret,
-            @Value("${app.keycloak.realm}") String realm,
-            @Value("${app.keycloak.serverUrl}") String serverUrl) {
+            @Value("${app.keycloak.admin.clientId}")
+            String adminClientId,
+            @Value("${app.keycloak.user.clientId}")
+            String userClientId,
+            @Value("${app.keycloak.admin.clientSecret}")
+            String clientSecret,
+            @Value("${app.keycloak.realm}")
+            String realm,
+            @Value("${app.keycloak.serverUrl}")
+            String serverUrl) {
         this.adminClientId = adminClientId;
         this.userClientId = userClientId;
         this.clientSecret = clientSecret;

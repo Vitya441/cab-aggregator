@@ -23,8 +23,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Void> registerUser(
-            @RequestBody NewUserDto newUserDto,
-            @RequestParam(name = "role") UserRole userRole
+            @RequestBody
+            NewUserDto newUserDto,
+            @RequestParam(name = "role")
+            UserRole userRole
     ) {
         userRegistrationService.registerUser(newUserDto, userRole);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -33,6 +35,5 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AccessTokenResponse> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(userRegistrationService.getJwt(loginRequest));
-
     }
 }
