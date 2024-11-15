@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: driver-service
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/driver_db}
+    username: ${DATASOURCE_USERNAME:vitya}
+    password: ${DATASOURCE_PASSWORD:22817}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    change-log: db/changelog/db.changelog-master.xml
+    enabled: true
