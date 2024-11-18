@@ -2,7 +2,9 @@ package by.modsen.driverservice.controller;
 
 import by.modsen.driverservice.dto.request.CarCreateDto;
 import by.modsen.driverservice.dto.response.CarDto;
+import by.modsen.driverservice.dto.response.PaginationDto;
 import by.modsen.driverservice.service.CarService;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/cars")
@@ -25,13 +26,23 @@ public class CarController {
     private final CarService carService;
 
     @GetMapping
-    public ResponseEntity<List<CarDto>> getAll() {
-        return ResponseEntity.ok(carService.getAll());
+    public ResponseEntity<PaginationDto<CarDto>> getAll(
+            @RequestParam(defaultValue = "0") @Min(value = 0)
+            int page,
+            @RequestParam(defaultValue = "15") @Min(value = 1)
+            int size
+    ) {
+        return ResponseEntity.ok(carService.getAll(page, size));
     }
 
     @GetMapping("/available")
-    public ResponseEntity<List<CarDto>> getAvailable() {
-        return ResponseEntity.ok(carService.getAvailable());
+    public ResponseEntity<PaginationDto<CarDto>> getAvailable(
+            @RequestParam(defaultValue = "0") @Min(value = 0)
+            int page,
+            @RequestParam(defaultValue = "15") @Min(value = 1)
+            int size
+    ) {
+        return ResponseEntity.ok(carService.getAvailable(page, size));
     }
 
     @GetMapping("/{id}")

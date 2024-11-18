@@ -3,14 +3,13 @@ package by.modsen.driverservice.service;
 import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
-
-import java.util.List;
+import by.modsen.driverservice.dto.response.PaginationDto;
 
 public interface DriverService {
 
-    List<DriverDto> getAll();
+    PaginationDto<DriverDto> getAll(int pageNumber, int pageSize);
 
-    List<DriverWithCarDto> getAllWithCar();
+    PaginationDto<DriverWithCarDto> getAllWithCar(int pageNumber, int pageSize);
 
     DriverDto getById(Long id);
 

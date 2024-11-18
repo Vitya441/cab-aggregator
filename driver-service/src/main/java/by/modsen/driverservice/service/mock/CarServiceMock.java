@@ -2,22 +2,21 @@ package by.modsen.driverservice.service.mock;
 
 import by.modsen.driverservice.dto.request.CarCreateDto;
 import by.modsen.driverservice.dto.response.CarDto;
+import by.modsen.driverservice.dto.response.PaginationDto;
 import by.modsen.driverservice.service.CarService;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CarServiceMock implements CarService {
 
     @Override
-    public List<CarDto> getAll() {
-        return List.of();
+    public PaginationDto<CarDto> getAll(int pageNumber, int pageSize) {
+        return null;
     }
 
     @Override
-    public List<CarDto> getAvailable() {
-        return List.of();
+    public PaginationDto<CarDto> getAvailable(int pageNumber, int pageSize) {
+        return null;
     }
 
     @Override
@@ -37,6 +36,5 @@ public class CarServiceMock implements CarService {
 
     @Override
     public void deleteById(Long id) {
-
     }
 }

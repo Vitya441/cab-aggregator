@@ -3,7 +3,9 @@ package by.modsen.driverservice.controller;
 import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
+import by.modsen.driverservice.dto.response.PaginationDto;
 import by.modsen.driverservice.service.DriverService;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/drivers")
 @RequiredArgsConstructor
@@ -27,13 +27,33 @@ public class DriverController {
     private final DriverService driverService;
 
     @GetMapping
-    public ResponseEntity<List<DriverDto>> getAll() {
-        return ResponseEntity.ok(driverService.getAll());
+    public ResponseEntity<PaginationDto<DriverDto>> getAll(
+            @RequestParam(defaultValue = "0") @Min(value = 0)
+            int page,
+            @RequestParam(defaultValue = "15") @Min(value = 1)
+            int size
+    ) {
+        return ResponseEntity.ok(driverService.getAll(page, size));
+    }
+
+    @GetMapping("/with-car")
+    public ResponseEntity<PaginationDto<DriverWithCarDto>> getAllWithCar(
+            @RequestParam(defaultValue = "0") @Min(value = 0)
+            int page,
+            @RequestParam(defaultValue = "15") @Min(value = 1)
+            int size
+    ) {
+        return ResponseEntity.ok(driverService.getAllWithCar(page, size));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DriverDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(driverService.getById(id));
+    }
+
+    @GetMapping("/with-car/{id}")
+    public ResponseEntity<DriverWithCarDto> getByIdWithCar(@PathVariable Long id) {
+        return ResponseEntity.ok(driverService.getWithCarById(id));
     }
 
     @PostMapping
@@ -62,15 +82,5 @@ public class DriverController {
     public ResponseEntity<?> unAssignCar(@PathVariable long id) {
         driverService.unAssignCarFromDriver(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/with-car/{id}")
-    public ResponseEntity<DriverWithCarDto> getByIdWithCar(@PathVariable Long id) {
-        return ResponseEntity.ok(driverService.getWithCarById(id));
-    }
-
-    @GetMapping("/with-car")
-    public ResponseEntity<List<DriverWithCarDto>> getAllWithCar() {
-        return ResponseEntity.ok(driverService.getAllWithCar());
     }
 }
