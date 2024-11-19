@@ -2,11 +2,11 @@ package by.modsen.driverservice.controller;
 
 import by.modsen.driverservice.dto.request.CarCreateDto;
 import by.modsen.driverservice.dto.response.CarDto;
-import by.modsen.driverservice.dto.response.PaginationDto;
-import by.modsen.driverservice.entity.enums.CarSort;
 import by.modsen.driverservice.service.CarService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,27 +27,27 @@ public class CarController {
     private final CarService carService;
 
     @GetMapping
-    public ResponseEntity<PaginationDto<CarDto>> getAll(
+    public ResponseEntity<Page<CarDto>> getAll(
             @RequestParam(defaultValue = "0") @Min(value = 0)
             int page,
             @RequestParam(defaultValue = "15") @Min(value = 1)
             int size,
-            @RequestParam(defaultValue = "ID_ASC")
-            CarSort sort
+            @RequestParam(name = "sort", defaultValue = "id")
+            String sortField
     ) {
-        return ResponseEntity.ok(carService.getAll(page, size, sort.getSortValue()));
+        return ResponseEntity.ok(carService.getAll(page, size, Sort.by(Sort.Direction.ASC, sortField)));
     }
 
     @GetMapping("/available")
-    public ResponseEntity<PaginationDto<CarDto>> getAvailable(
+    public ResponseEntity<Page<CarDto>> getAvailable(
             @RequestParam(defaultValue = "0") @Min(value = 0)
             int page,
             @RequestParam(defaultValue = "15") @Min(value = 1)
             int size,
-            @RequestParam(defaultValue = "ID_ASC")
-            CarSort sort
+            @RequestParam(name = "sort", defaultValue = "id")
+            String sortField
     ) {
-        return ResponseEntity.ok(carService.getAvailable(page, size, sort.getSortValue()));
+        return ResponseEntity.ok(carService.getAvailable(page, size, Sort.by(Sort.Direction.ASC, sortField)));
     }
 
     @GetMapping("/{id}")

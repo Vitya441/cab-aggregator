@@ -2,8 +2,8 @@ package by.modsen.driverservice.service.mock;
 
 import by.modsen.driverservice.dto.request.CarCreateDto;
 import by.modsen.driverservice.dto.response.CarDto;
-import by.modsen.driverservice.dto.response.PaginationDto;
 import by.modsen.driverservice.service.CarService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 public class CarServiceMock implements CarService {
 
     @Override
-    public PaginationDto<CarDto> getAll(int pageNumber, int pageSize, Sort sort) {
+    public Page<CarDto> getAll(int pageNumber, int pageSize, Sort sort) {
         return null;
     }
 
     @Override
-    public PaginationDto<CarDto> getAvailable(int pageNumber, int pageSize, Sort sort) {
+    public Page<CarDto> getAvailable(int pageNumber, int pageSize, Sort sort) {
         return null;
     }
 
