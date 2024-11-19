@@ -3,6 +3,7 @@ package by.modsen.driverservice.controller;
 import by.modsen.driverservice.dto.request.CarCreateDto;
 import by.modsen.driverservice.dto.response.CarDto;
 import by.modsen.driverservice.dto.response.PaginationDto;
+import by.modsen.driverservice.entity.enums.CarSort;
 import by.modsen.driverservice.service.CarService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,11 @@ public class CarController {
             @RequestParam(defaultValue = "0") @Min(value = 0)
             int page,
             @RequestParam(defaultValue = "15") @Min(value = 1)
-            int size
+            int size,
+            @RequestParam(defaultValue = "ID_ASC")
+            CarSort sort
     ) {
-        return ResponseEntity.ok(carService.getAll(page, size));
+        return ResponseEntity.ok(carService.getAll(page, size, sort.getSortValue()));
     }
 
     @GetMapping("/available")
@@ -40,9 +43,11 @@ public class CarController {
             @RequestParam(defaultValue = "0") @Min(value = 0)
             int page,
             @RequestParam(defaultValue = "15") @Min(value = 1)
-            int size
+            int size,
+            @RequestParam(defaultValue = "ID_ASC")
+            CarSort sort
     ) {
-        return ResponseEntity.ok(carService.getAvailable(page, size));
+        return ResponseEntity.ok(carService.getAvailable(page, size, sort.getSortValue()));
     }
 
     @GetMapping("/{id}")

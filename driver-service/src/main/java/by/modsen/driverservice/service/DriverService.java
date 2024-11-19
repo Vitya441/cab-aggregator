@@ -4,12 +4,13 @@ import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
 import by.modsen.driverservice.dto.response.PaginationDto;
+import org.springframework.data.domain.Sort;
 
 public interface DriverService {
 
-    PaginationDto<DriverDto> getAll(int pageNumber, int pageSize);
+    PaginationDto<DriverDto> getAll(int pageNumber, int pageSize, Sort sort);
 
-    PaginationDto<DriverWithCarDto> getAllWithCar(int pageNumber, int pageSize);
+    PaginationDto<DriverWithCarDto> getAllWithCar(int pageNumber, int pageSize, Sort sort);
 
     DriverDto getById(Long id);
 

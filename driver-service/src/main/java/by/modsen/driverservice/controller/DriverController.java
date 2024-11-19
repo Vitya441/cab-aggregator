@@ -4,6 +4,7 @@ import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
 import by.modsen.driverservice.dto.response.PaginationDto;
+import by.modsen.driverservice.entity.enums.DriverSort;
 import by.modsen.driverservice.service.DriverService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,11 @@ public class DriverController {
             @RequestParam(defaultValue = "0") @Min(value = 0)
             int page,
             @RequestParam(defaultValue = "15") @Min(value = 1)
-            int size
+            int size,
+            @RequestParam(defaultValue = "ID_ASC")
+            DriverSort sort
     ) {
-        return ResponseEntity.ok(driverService.getAll(page, size));
+        return ResponseEntity.ok(driverService.getAll(page, size, sort.getSortValue()));
     }
 
     @GetMapping("/with-car")
@@ -41,9 +44,11 @@ public class DriverController {
             @RequestParam(defaultValue = "0") @Min(value = 0)
             int page,
             @RequestParam(defaultValue = "15") @Min(value = 1)
-            int size
+            int size,
+            @RequestParam(defaultValue = "ID_ASC")
+            DriverSort sort
     ) {
-        return ResponseEntity.ok(driverService.getAllWithCar(page, size));
+        return ResponseEntity.ok(driverService.getAllWithCar(page, size, sort.getSortValue()));
     }
 
     @GetMapping("/{id}")
