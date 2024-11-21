@@ -9,4 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface CarRepository extends JpaRepository<Car, Long> {
     @Query("SELECT c FROM Car c WHERE c.driver IS NULL")
     Page<Car> findAvailable(Pageable pageable);
+
+    boolean existsByLicenseNumber(String licenseNumber);
+
 }

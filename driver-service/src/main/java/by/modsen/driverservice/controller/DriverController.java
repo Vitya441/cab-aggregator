@@ -4,12 +4,15 @@ import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
 import by.modsen.driverservice.service.DriverService;
+import by.modsen.driverservice.util.MessageUtil;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,15 +26,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/drivers")
 @RequiredArgsConstructor
+@Validated
 public class DriverController {
 
     private final DriverService driverService;
 
     @GetMapping
     public ResponseEntity<Page<DriverDto>> getAll(
-            @RequestParam(defaultValue = "0") @Min(value = 0)
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = MessageUtil.VALIDATION_PAGE_NUMBER)
             int page,
-            @RequestParam(defaultValue = "15") @Min(value = 1)
+            @RequestParam(defaultValue = "15") @Min(value = 1, message = MessageUtil.VALIDATION_PAGE_SIZE)
             int size,
             @RequestParam(name = "sort", defaultValue = "id")
             String sortField
@@ -42,9 +46,9 @@ public class DriverController {
 
     @GetMapping("/with-car")
     public ResponseEntity<Page<DriverWithCarDto>> getAllWithCar(
-            @RequestParam(defaultValue = "0") @Min(value = 0)
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = MessageUtil.VALIDATION_PAGE_NUMBER)
             int page,
-            @RequestParam(defaultValue = "15") @Min(value = 1)
+            @RequestParam(defaultValue = "15") @Min(value = 1, message = MessageUtil.VALIDATION_PAGE_SIZE)
             int size,
             @RequestParam(name = "sort", defaultValue = "id")
             String sortField
@@ -64,12 +68,12 @@ public class DriverController {
     }
 
     @PostMapping
-    public ResponseEntity<DriverDto> create(@RequestBody DriverCreateDto driverCreateDto) {
+    public ResponseEntity<DriverDto> create(@Valid @RequestBody DriverCreateDto driverCreateDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(driverService.create(driverCreateDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DriverDto> update(@PathVariable Long id, @RequestBody DriverCreateDto driverCreateDto) {
+    public ResponseEntity<DriverDto> update(@PathVariable Long id, @Valid @RequestBody DriverCreateDto driverCreateDto) {
         return ResponseEntity.ok(driverService.update(id, driverCreateDto));
     }
 
