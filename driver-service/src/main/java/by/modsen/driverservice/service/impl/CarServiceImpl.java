@@ -2,18 +2,22 @@ package by.modsen.driverservice.service.impl;
 
 import by.modsen.driverservice.dto.request.CarCreateDto;
 import by.modsen.driverservice.dto.response.CarDto;
+import by.modsen.driverservice.dto.response.PaginationDto;
 import by.modsen.driverservice.entity.Car;
 import by.modsen.driverservice.exception.LicenseNumberExistsException;
 import by.modsen.driverservice.exception.NotFoundException;
 import by.modsen.driverservice.mapper.CarMapper;
 import by.modsen.driverservice.repository.CarRepository;
 import by.modsen.driverservice.service.CarService;
-import by.modsen.driverservice.util.MessageUtil;
+import by.modsen.driverservice.util.ExceptionMessageKeyConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,32 +27,51 @@ public class CarServiceImpl implements CarService {
     private final CarMapper mapper;
 
     @Override
-    public Page<CarDto> getAll(int pageNumber, int pageSize, Sort sort) {
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, sort);
+    public PaginationDto<CarDto> getAll(int pageNumber, int pageSize, String sortField) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortField));
         Page<Car> page = repository.findAll(pageRequest);
+        List<CarDto> data = page.getContent().stream()
+                .map(mapper::toDto)
+                .toList();
 
-        return page.map(mapper::toDto);
+        return new PaginationDto<>(
+                data,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
     }
 
     @Override
-    public Page<CarDto> getAvailable(int pageNumber, int pageSize, Sort sort) {
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, sort);
-        Page<Car> page = repository.findAvailable(pageRequest);
+    public PaginationDto<CarDto> getAvailable(int pageNumber, int pageSize, String sortField) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortField));
+        Page<Car> page = repository.findCarByDriverIsNull(pageRequest);
+        List<CarDto> data = page.getContent().stream()
+                .map(mapper::toDto)
+                .toList();
 
-        return page.map(mapper::toDto);
+        return new PaginationDto<>(
+                data,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
     }
 
     @Override
     public CarDto getById(Long id) {
-        Car car = getOrThrow(id);
+        Car car = getCarByIdOrThrow(id);
 
         return mapper.toDto(car);
     }
 
+    @Transactional
     @Override
     public CarDto create(CarCreateDto carCreateDto) {
         if (repository.existsByLicenseNumber(carCreateDto.licenseNumber())) {
-            throw new LicenseNumberExistsException(MessageUtil.LICENSE_NUMBER_EXISTS);
+            throw new LicenseNumberExistsException(ExceptionMessageKeyConstants.LICENSE_NUMBER_EXISTS);
         }
         Car car = mapper.toEntity(carCreateDto);
         Car savedCar = repository.save(car);
@@ -56,11 +79,12 @@ public class CarServiceImpl implements CarService {
         return mapper.toDto(savedCar);
     }
 
+    @Transactional
     @Override
     public CarDto update(Long id, CarCreateDto carUpdateDto) {
-        Car currentCar = getOrThrow(id);
+        Car currentCar = getCarByIdOrThrow(id);
         if (!currentCar.getLicenseNumber().equals(carUpdateDto.licenseNumber()) && repository.existsByLicenseNumber(carUpdateDto.licenseNumber())) {
-            throw new LicenseNumberExistsException(MessageUtil.LICENSE_NUMBER_EXISTS);
+            throw new LicenseNumberExistsException(ExceptionMessageKeyConstants.LICENSE_NUMBER_EXISTS);
         }
         mapper.updateEntityFromDto(carUpdateDto, currentCar);
         Car savedCar = repository.save(currentCar);
@@ -68,15 +92,16 @@ public class CarServiceImpl implements CarService {
         return mapper.toDto(savedCar);
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
-        getOrThrow(id);
+        getCarByIdOrThrow(id);
         repository.deleteById(id);
     }
 
-    private Car getOrThrow(long id) {
+    private Car getCarByIdOrThrow(long id) {
         return repository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException(MessageUtil.CAR_NOT_FOUND, id));
+                .orElseThrow(() -> new NotFoundException(ExceptionMessageKeyConstants.CAR_NOT_FOUND, id));
     }
 }

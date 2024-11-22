@@ -3,13 +3,12 @@ package by.modsen.driverservice.controller;
 import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
+import by.modsen.driverservice.dto.response.PaginationDto;
 import by.modsen.driverservice.service.DriverService;
-import by.modsen.driverservice.util.MessageUtil;
+import by.modsen.driverservice.util.ExceptionMessageKeyConstants;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -32,29 +31,27 @@ public class DriverController {
     private final DriverService driverService;
 
     @GetMapping
-    public ResponseEntity<Page<DriverDto>> getAll(
-            @RequestParam(defaultValue = "0") @Min(value = 0, message = MessageUtil.VALIDATION_PAGE_NUMBER)
+    public ResponseEntity<PaginationDto<DriverDto>> getAll(
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = ExceptionMessageKeyConstants.VALIDATION_PAGE_NUMBER)
             int page,
-            @RequestParam(defaultValue = "15") @Min(value = 1, message = MessageUtil.VALIDATION_PAGE_SIZE)
+            @RequestParam(defaultValue = "15") @Min(value = 1, message = ExceptionMessageKeyConstants.VALIDATION_PAGE_SIZE)
             int size,
             @RequestParam(name = "sort", defaultValue = "id")
             String sortField
     ) {
-        Page<DriverDto> driverPage = driverService.getAll(page, size, Sort.by(Sort.Direction.ASC, sortField));
-        return ResponseEntity.ok(driverPage);
+        return ResponseEntity.ok(driverService.getAll(page, size, sortField));
     }
 
     @GetMapping("/with-car")
-    public ResponseEntity<Page<DriverWithCarDto>> getAllWithCar(
-            @RequestParam(defaultValue = "0") @Min(value = 0, message = MessageUtil.VALIDATION_PAGE_NUMBER)
+    public ResponseEntity<PaginationDto<DriverWithCarDto>> getAllWithCar(
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = ExceptionMessageKeyConstants.VALIDATION_PAGE_NUMBER)
             int page,
-            @RequestParam(defaultValue = "15") @Min(value = 1, message = MessageUtil.VALIDATION_PAGE_SIZE)
+            @RequestParam(defaultValue = "15") @Min(value = 1, message = ExceptionMessageKeyConstants.VALIDATION_PAGE_SIZE)
             int size,
             @RequestParam(name = "sort", defaultValue = "id")
             String sortField
     ) {
-        Page<DriverWithCarDto> driverPage= driverService.getAllWithCar(page, size, Sort.by(Sort.Direction.ASC, sortField));
-        return ResponseEntity.ok(driverPage);
+        return ResponseEntity.ok(driverService.getAllWithCar(page, size, sortField));
     }
 
     @GetMapping("/{id}")
@@ -64,7 +61,7 @@ public class DriverController {
 
     @GetMapping("/with-car/{id}")
     public ResponseEntity<DriverWithCarDto> getByIdWithCar(@PathVariable Long id) {
-        return ResponseEntity.ok(driverService.getWithCarById(id));
+        return ResponseEntity.ok(driverService.getByIdWithCar(id));
     }
 
     @PostMapping

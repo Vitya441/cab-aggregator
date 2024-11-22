@@ -58,17 +58,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // Валидация Enum
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorDto> handleValidationException(HttpMessageNotReadableException exception) {
-        String errorDetails = "";
-        if (exception.getCause() instanceof InvalidFormatException) {
-            InvalidFormatException ifx = (InvalidFormatException) exception.getCause();
-            if (ifx.getTargetType()!=null && ifx.getTargetType().isEnum()) {
-                errorDetails = String.format("Invalid enum value: '%s' for the field: '%s'. The value must be one of: %s.",
-                        ifx.getValue(), ifx.getPath().get(ifx.getPath().size()-1).getFieldName(), Arrays.toString(ifx.getTargetType().getEnumConstants()));
-            }
-        }
+        String errorDetails = getEnumValidationError(exception);
         ErrorDto errorDto = new ErrorDto(HttpStatus.BAD_REQUEST.value(), errorDetails);
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
     }
@@ -90,7 +82,22 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
     }
 
+    private String getEnumValidationError(HttpMessageNotReadableException exception) {
+        if (!(exception.getCause() instanceof InvalidFormatException ifx)
+                || ifx.getTargetType() == null
+                || !ifx.getTargetType().isEnum()) {
+            return "Invalid input data.";
+        }
 
+        String fieldName = ifx.getPath().isEmpty()
+                ? "unknown"
+                : ifx.getPath().get(ifx.getPath().size() - 1).getFieldName();
 
-
+        return String.format(
+                "Invalid enum value: '%s' for the field: '%s'. The value must be one of: %s.",
+                ifx.getValue(),
+                fieldName,
+                Arrays.toString(ifx.getTargetType().getEnumConstants())
+        );
+    }
 }

@@ -10,13 +10,13 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import java.util.Locale;
 
 @Configuration
-public class WebConfig {
+public class LocalizationConfig {
 
     @Bean
     public MessageSource exceptionMessageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasenames("classpath:exception", "classpath:validation");
-        messageSource.setDefaultEncoding("ISO-8859-1");
+        messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
 

@@ -3,6 +3,7 @@ package by.modsen.driverservice.service.impl;
 import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
+import by.modsen.driverservice.dto.response.PaginationDto;
 import by.modsen.driverservice.entity.Car;
 import by.modsen.driverservice.entity.Driver;
 import by.modsen.driverservice.exception.CarAlreadyAssignedException;
@@ -12,12 +13,15 @@ import by.modsen.driverservice.mapper.DriverMapper;
 import by.modsen.driverservice.repository.CarRepository;
 import by.modsen.driverservice.repository.DriverRepository;
 import by.modsen.driverservice.service.DriverService;
-import by.modsen.driverservice.util.MessageUtil;
+import by.modsen.driverservice.util.ExceptionMessageKeyConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,39 +32,58 @@ public class DriverServiceImpl implements DriverService {
     private final DriverMapper driverMapper;
 
     @Override
-    public Page<DriverDto> getAll(int pageNumber, int pageSize, Sort sort) {
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, sort);
+    public PaginationDto<DriverDto> getAll(int pageNumber, int pageSize, String sortField) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortField));
         Page<Driver> page = driverRepository.findAll(pageRequest);
+        List<DriverDto> data = page.getContent().stream()
+                .map(driverMapper::toDto)
+                .toList();
 
-        return page.map(driverMapper::toDto);
+        return new PaginationDto<>(
+                data,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
     }
 
     @Override
-    public Page<DriverWithCarDto> getAllWithCar(int pageNumber, int pageSize, Sort sort) {
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, sort);
+    public PaginationDto<DriverWithCarDto> getAllWithCar(int pageNumber, int pageSize, String sortField) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortField));
         Page<Driver> page = driverRepository.findAll(pageRequest);
+        List<DriverWithCarDto> data = page.getContent().stream()
+                .map(driverMapper::toDriverWithCarDto)
+                .toList();
 
-        return page.map(driverMapper::toDriverWithCarDto);
+        return new PaginationDto<>(
+                data,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
     }
 
     @Override
     public DriverDto getById(Long id) {
-        Driver driver = getDriverOrThrow(id);
+        Driver driver = getDriverByIdOrThrow(id);
 
         return driverMapper.toDto(driver);
     }
 
     @Override
-    public DriverWithCarDto getWithCarById(Long id) {
-        Driver driver = getDriverOrThrow(id);
+    public DriverWithCarDto getByIdWithCar(Long id) {
+        Driver driver = getDriverByIdOrThrow(id);
 
         return driverMapper.toDriverWithCarDto(driver);
     }
 
+    @Transactional
     @Override
     public DriverDto create(DriverCreateDto driverCreateDto) {
         if (driverRepository.existsByPhone(driverCreateDto.phone())) {
-            throw new PhoneExistsException(MessageUtil.PHONE_EXISTS);
+            throw new PhoneExistsException(ExceptionMessageKeyConstants.PHONE_EXISTS);
         }
         Driver driver = driverMapper.toEntity(driverCreateDto);
         Driver savedDriver = driverRepository.save(driver);
@@ -68,11 +91,12 @@ public class DriverServiceImpl implements DriverService {
         return driverMapper.toDto(savedDriver);
     }
 
+    @Transactional
     @Override
     public DriverDto update(Long id, DriverCreateDto driverUpdateDto) {
-        Driver currentDriver = getDriverOrThrow(id);
+        Driver currentDriver = getDriverByIdOrThrow(id);
         if (!currentDriver.getPhone().equals(driverUpdateDto.phone()) && driverRepository.existsByPhone(driverUpdateDto.phone())) {
-            throw new PhoneExistsException(MessageUtil.PHONE_EXISTS);
+            throw new PhoneExistsException(ExceptionMessageKeyConstants.PHONE_EXISTS);
         }
         driverMapper.updateEntityFromDto(driverUpdateDto, currentDriver);
         Driver savedDriver = driverRepository.save(currentDriver);
@@ -80,39 +104,42 @@ public class DriverServiceImpl implements DriverService {
         return driverMapper.toDto(savedDriver);
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
-        getDriverOrThrow(id);
+        getDriverByIdOrThrow(id);
         driverRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public void assignCarToDriver(long id, long carId) {
-        Driver driver = getDriverOrThrow(id);
-        Car car = getCarOrThrow(carId);
+        Driver driver = getDriverByIdOrThrow(id);
+        Car car = getCarByIdOrThrow(carId);
         if (car.getDriver() != null) {
-            throw new CarAlreadyAssignedException(MessageUtil.CAR_ALREADY_ASSIGNED, carId);
+            throw new CarAlreadyAssignedException(ExceptionMessageKeyConstants.CAR_ALREADY_ASSIGNED, carId);
         }
         driver.setCar(car);
         driverRepository.save(driver);
     }
 
+    @Transactional
     @Override
     public void unAssignCarFromDriver(long id) {
-        Driver driver = getDriverOrThrow(id);
+        Driver driver = getDriverByIdOrThrow(id);
         driver.setCar(null);
         driverRepository.save(driver);
     }
 
-    private Driver getDriverOrThrow(long id) {
+    private Driver getDriverByIdOrThrow(long id) {
         return driverRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException(MessageUtil.DRIVER_NOT_FOUND, id));
+                .orElseThrow(() -> new NotFoundException(ExceptionMessageKeyConstants.DRIVER_NOT_FOUND, id));
     }
 
-    private Car getCarOrThrow(long id) {
+    private Car getCarByIdOrThrow(long id) {
         return carRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException(MessageUtil.CAR_NOT_FOUND, id));
+                .orElseThrow(() -> new NotFoundException(ExceptionMessageKeyConstants.CAR_NOT_FOUND, id));
     }
 }

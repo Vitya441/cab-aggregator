@@ -1,9 +1,7 @@
 package by.modsen.driverservice.util;
 
-import org.springframework.stereotype.Component;
+public class ExceptionMessageKeyConstants {
 
-@Component
-public class MessageUtil {
     public static final String DRIVER_NOT_FOUND = "driver.notFound";
     public static final String CAR_NOT_FOUND = "car.notFound";
     public static final String PHONE_EXISTS = "driver.phoneExists";
@@ -20,8 +18,6 @@ public class MessageUtil {
     public static final String VALIDATION_BRAND_SIZE="car.brand.size";
     public static final String VALIDATION_MODEL="car.model";
     public static final String VALIDATION_MODEL_SIZE="car.model.size";
-    public static final String VALIDATION_CATEGORY="car.category";
-    public static final String VALIDATION_CATEGORY_SIZE="car.category.size";
 
     public static final String VALIDATION_FIRSTNAME="driver.firstname";
     public static final String VALIDATION_FIRSTNAME_SIZE="driver.firstname.size";
@@ -33,7 +29,4 @@ public class MessageUtil {
 
     public static final String VALIDATION_PAGE_NUMBER="page.number";
     public static final String VALIDATION_PAGE_SIZE="page.size";
-
-
-
 }
