@@ -2,14 +2,13 @@ package by.modsen.driverservice.service;
 
 import by.modsen.driverservice.dto.request.CarCreateDto;
 import by.modsen.driverservice.dto.response.CarDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
+import by.modsen.driverservice.dto.response.PaginationDto;
 
 public interface CarService {
 
-    Page<CarDto> getAll(int pageNumber, int pageSize, Sort sort);
+    PaginationDto<CarDto> getAll(int pageNumber, int pageSize, String sortField);
 
-    Page<CarDto> getAvailable(int pageNumber, int pageSize, Sort sort);
+    PaginationDto<CarDto> getAvailable(int pageNumber, int pageSize, String sortField);
 
     CarDto getById(Long id);
 
@@ -18,4 +17,5 @@ public interface CarService {
     CarDto update(Long id, CarCreateDto carCreateDto);
 
     void deleteById(Long id);
+
 }
