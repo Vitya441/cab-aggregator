@@ -10,6 +10,7 @@ import by.modsen.keycloakservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.AccessTokenResponse;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +20,8 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     private final UserService userService;
     private final RoleService roleService;
     private final KeycloakConfig keycloakConfig;
+    private final KafkaTemplate<String, NewUserDto> kafkaTemplate;
+
 
     @Override
     public AccessTokenResponse getJwt(LoginRequest loginRequest) {
@@ -34,5 +37,10 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     public void registerUser(NewUserDto newUserDto, UserRole userRole) {
         String userId = userService.createUser(newUserDto);
         roleService.assignRole(userId, userRole.name());
+        if (userRole == UserRole.PASSENGER) {
+            kafkaTemplate.send("passenger-topic", newUserDto);
+        } else if (userRole == UserRole.DRIVER) {
+            kafkaTemplate.send("driver-topic", newUserDto);
+        }
     }
 }

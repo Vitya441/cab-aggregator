@@ -13,7 +13,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +23,6 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "driver")
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
@@ -44,7 +42,7 @@ public class Driver {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "phone", nullable = false)
+    @Column(nullable = true, unique = true)
     private String phone;
 
     @Column(name = "status", nullable = false)

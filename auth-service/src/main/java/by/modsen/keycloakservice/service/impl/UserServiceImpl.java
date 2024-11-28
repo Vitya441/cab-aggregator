@@ -1,6 +1,7 @@
 package by.modsen.keycloakservice.service.impl;
 
 import by.modsen.keycloakservice.dto.NewUserDto;
+import by.modsen.keycloakservice.exception.UserCreateException;
 import by.modsen.keycloakservice.service.UserService;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
         UsersResource usersResource = getUsersResource();
         Response response = usersResource.create(userRepresentation);
         if (response.getStatus() != HttpStatus.CREATED.value()) {
-            throw new RuntimeException("Failed to create user: Status code = " + response.getStatus());
+            throw new UserCreateException("User with this credentials already exists");
         }
         String userId = extractUserIdFromLocation(response.getLocation());
         log.info("User created with ID: {}", userId);
@@ -75,6 +76,7 @@ public class UserServiceImpl implements UserService {
         userRepresentation.setLastName(newUserDto.lastName());
         userRepresentation.setUsername(newUserDto.username());
         userRepresentation.setEmail(newUserDto.email());
+        // PHONE ???
         userRepresentation.setEmailVerified(true);
 
         CredentialRepresentation credentialRepresentation = new CredentialRepresentation();

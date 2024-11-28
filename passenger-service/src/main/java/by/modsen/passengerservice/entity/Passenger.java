@@ -1,13 +1,10 @@
 package by.modsen.passengerservice.entity;
 
-import by.modsen.passengerservice.entity.enums.PaymentMethod;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,30 +35,17 @@ public class Passenger {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-
     @Column(name = "firstname", nullable = false)
     private String firstName;
 
     @Column(name = "lastname", nullable = false)
     private String lastName;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String phone;
 
     @Column(name = "birthdate", nullable = false)
     private LocalDate birthDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method", nullable = false)
-    private PaymentMethod preferredPaymentMethod;
 
     @Column
     private BigDecimal balance;
@@ -78,8 +62,4 @@ public class Passenger {
     @LastModifiedDate
     @Column(name = "updated_at")
     private Instant updatedAt;
-
-    public Double getAverageRating() {
-        return ratings.isEmpty() ? null : ratings.stream().mapToInt(Integer::intValue).average().orElse(0);
-    }
 }

@@ -1,6 +1,7 @@
 package by.modsen.driverservice.service;
 
 import by.modsen.driverservice.dto.request.DriverCreateDto;
+import by.modsen.driverservice.dto.request.DriverUpdateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
 import by.modsen.driverservice.dto.response.PaginationDto;
@@ -17,7 +18,7 @@ public interface DriverService {
 
     DriverDto create(DriverCreateDto driverCreateDto);
 
-    DriverDto update(Long id, DriverCreateDto driverCreateDto);
+    DriverDto update(Long id, DriverUpdateDto driverUpdateDto);
 
     void deleteById(Long id);
 

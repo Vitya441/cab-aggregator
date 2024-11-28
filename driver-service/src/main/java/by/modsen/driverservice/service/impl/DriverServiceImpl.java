@@ -1,6 +1,7 @@
 package by.modsen.driverservice.service.impl;
 
 import by.modsen.driverservice.dto.request.DriverCreateDto;
+import by.modsen.driverservice.dto.request.DriverUpdateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
 import by.modsen.driverservice.dto.response.PaginationDto;
@@ -82,9 +83,6 @@ public class DriverServiceImpl implements DriverService {
     @Transactional
     @Override
     public DriverDto create(DriverCreateDto driverCreateDto) {
-        if (driverRepository.existsByPhone(driverCreateDto.phone())) {
-            throw new PhoneExistsException(ExceptionMessageKeyConstants.PHONE_EXISTS);
-        }
         Driver driver = driverMapper.toEntity(driverCreateDto);
         Driver savedDriver = driverRepository.save(driver);
 
@@ -93,10 +91,12 @@ public class DriverServiceImpl implements DriverService {
 
     @Transactional
     @Override
-    public DriverDto update(Long id, DriverCreateDto driverUpdateDto) {
+    public DriverDto update(Long id, DriverUpdateDto driverUpdateDto) {
         Driver currentDriver = getDriverByIdOrThrow(id);
-        if (!currentDriver.getPhone().equals(driverUpdateDto.phone()) && driverRepository.existsByPhone(driverUpdateDto.phone())) {
-            throw new PhoneExistsException(ExceptionMessageKeyConstants.PHONE_EXISTS);
+        if (driverUpdateDto.phone() != null && !driverUpdateDto.phone().equals(currentDriver.getPhone())) {
+            if (driverRepository.existsByPhone(driverUpdateDto.phone())) {
+                throw new PhoneExistsException(ExceptionMessageKeyConstants.PHONE_EXISTS);
+            }
         }
         driverMapper.updateEntityFromDto(driverUpdateDto, currentDriver);
         Driver savedDriver = driverRepository.save(currentDriver);

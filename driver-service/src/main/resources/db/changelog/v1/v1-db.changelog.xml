@@ -8,7 +8,4 @@
     <include file="v1-car-table.xml" relativeToChangelogFile="true"/>
     <include file="v1-driver-table.xml" relativeToChangelogFile="true"/>
 
-<!--    <include file="v1-fill-car.changelog.xml" relativeToChangelogFile="true"/>-->
-<!--    <include file="v1-fill-driver.changelog.xml" relativeToChangelogFile="true"/>-->
-
 </databaseChangeLog>
