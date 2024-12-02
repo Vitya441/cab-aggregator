@@ -10,6 +10,7 @@ import by.modsen.keycloakservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.AccessTokenResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,10 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     private final RoleService roleService;
     private final KeycloakConfig keycloakConfig;
     private final KafkaTemplate<String, NewUserDto> kafkaTemplate;
-
+    @Value("${app.kafka.topics.passenger.name}")
+    private String passengerTopic;
+    @Value("${app.kafka.topics.driver.name}")
+    private String driverTopic;
 
     @Override
     public AccessTokenResponse getJwt(LoginRequest loginRequest) {
@@ -38,9 +42,9 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         String userId = userService.createUser(newUserDto);
         roleService.assignRole(userId, userRole.name());
         if (userRole == UserRole.PASSENGER) {
-            kafkaTemplate.send("passenger-topic", newUserDto);
+            kafkaTemplate.send(passengerTopic, newUserDto);
         } else if (userRole == UserRole.DRIVER) {
-            kafkaTemplate.send("driver-topic", newUserDto);
+            kafkaTemplate.send(driverTopic, newUserDto);
         }
     }
 }

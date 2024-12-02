@@ -76,7 +76,6 @@ public class UserServiceImpl implements UserService {
         userRepresentation.setLastName(newUserDto.lastName());
         userRepresentation.setUsername(newUserDto.username());
         userRepresentation.setEmail(newUserDto.email());
-        // PHONE ???
         userRepresentation.setEmailVerified(true);
 
         CredentialRepresentation credentialRepresentation = new CredentialRepresentation();

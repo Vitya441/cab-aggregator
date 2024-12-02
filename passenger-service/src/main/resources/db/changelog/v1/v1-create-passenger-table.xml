@@ -11,9 +11,9 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <!--            <column name="username" type="VARCHAR(128)">-->
-            <!--                <constraints unique="true"/>-->
-            <!--            </column>-->
+            <column name="username" type="VARCHAR(128)">
+                <constraints unique="true"/>
+            </column>
             <column name="firstname" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>

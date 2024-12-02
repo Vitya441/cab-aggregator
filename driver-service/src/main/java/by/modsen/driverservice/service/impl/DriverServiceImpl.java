@@ -93,10 +93,9 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public DriverDto update(Long id, DriverUpdateDto driverUpdateDto) {
         Driver currentDriver = getDriverByIdOrThrow(id);
-        if (driverUpdateDto.phone() != null && !driverUpdateDto.phone().equals(currentDriver.getPhone())) {
-            if (driverRepository.existsByPhone(driverUpdateDto.phone())) {
-                throw new PhoneExistsException(ExceptionMessageKeyConstants.PHONE_EXISTS);
-            }
+        if (!driverUpdateDto.phone().equals(currentDriver.getPhone())
+                && driverRepository.existsByPhone(driverUpdateDto.phone())) {
+            throw new PhoneExistsException(ExceptionMessageKeyConstants.PHONE_EXISTS);
         }
         driverMapper.updateEntityFromDto(driverUpdateDto, currentDriver);
         Driver savedDriver = driverRepository.save(currentDriver);

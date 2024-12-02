@@ -3,22 +3,23 @@ package by.modsen.passengerservice.kafka;
 import by.modsen.passengerservice.dto.request.PassengerCreateDto;
 import by.modsen.passengerservice.service.PassengerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PassengerConsumer {
 
     private final PassengerService passengerService;
 
     @KafkaListener(
-            topics = "passenger-topic",
-            groupId = "passenger-group"
+            topics = "#{@environment.getProperty('app.kafka.consumer.topic')}",
+            groupId = "#{@environment.getProperty('app.kafka.consumer.group-id')}"
     )
-    public void receiveUserFromKeycloakAndCreate(NewUserDto newUserDto) {
-        System.out.println("Полученный пользователь (email): " + newUserDto);
-
+    public void handlePassengerCreated(NewUserDto newUserDto) {
+        log.info("Passenger received: {}", newUserDto);
         passengerService.create(
                 PassengerCreateDto.builder()
                         .firstName(newUserDto.firstName())

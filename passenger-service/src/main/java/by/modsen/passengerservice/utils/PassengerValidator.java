@@ -1,6 +1,5 @@
 package by.modsen.passengerservice.utils;
 
-import by.modsen.passengerservice.dto.request.PassengerCreateDto;
 import by.modsen.passengerservice.dto.request.PassengerUpdateDto;
 import by.modsen.passengerservice.entity.Passenger;
 import by.modsen.passengerservice.exception.PassengerWithPhoneExistsException;
@@ -14,14 +13,8 @@ public class PassengerValidator {
 
     private final PassengerRepository repository;
 
-    public void validateUniqueness(PassengerCreateDto dto) {
-//        validateUsernameUniqueness(dto.username());
-//        validateEmailUniqueness(dto.email());
-//        validatePhoneUniqueness(dto.phone());
-    }
-
     public void validateUniqueness(PassengerUpdateDto dto, Passenger currentPassenger) {
-        if (currentPassenger.getPhone()!= null && !currentPassenger.getPhone().equals(dto.phone())) {
+        if (!dto.phone().equals(currentPassenger.getPhone())) {
             validatePhoneUniqueness(dto.phone());
         }
     }

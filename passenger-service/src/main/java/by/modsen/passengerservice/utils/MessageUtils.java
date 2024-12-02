@@ -1,8 +1,5 @@
 package by.modsen.passengerservice.utils;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class MessageUtils {
 
     public static final String PASSENGER_NOT_FOUND_ERROR = "passenger.notFound";
