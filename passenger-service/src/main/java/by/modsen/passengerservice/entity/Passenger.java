@@ -41,10 +41,10 @@ public class Passenger {
     @Column(name = "lastname", nullable = false)
     private String lastName;
 
-    @Column(nullable = true, unique = true)
+    @Column(nullable = true)
     private String phone;
 
-    @Column(name = "birthdate", nullable = false)
+    @Column(name = "birthdate")
     private LocalDate birthDate;
 
     @Column

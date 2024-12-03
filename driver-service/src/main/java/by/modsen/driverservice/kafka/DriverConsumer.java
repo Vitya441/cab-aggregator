@@ -19,7 +19,7 @@ public class DriverConsumer {
             groupId = "#{@environment.getProperty('app.kafka.consumer.group-id')}"
     )
     public void handleDriverCreated(NewUserDto newUserDto) {
-        log.info("Driver received: {}", newUserDto);
+        log.info("Handling driver created. Started. Driver name = {}", newUserDto.firstName());
         driverService.create(
                 DriverCreateDto.builder()
                         .firstName(newUserDto.firstName())

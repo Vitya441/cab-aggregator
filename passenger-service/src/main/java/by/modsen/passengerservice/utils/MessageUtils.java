@@ -1,6 +1,6 @@
 package by.modsen.passengerservice.utils;
 
-public class MessageUtils {
+public final class MessageUtils {
 
     public static final String PASSENGER_NOT_FOUND_ERROR = "passenger.notFound";
     public static final String PASSENGER_USERNAME_EXIST_ERROR = "passenger.usernameExists";
@@ -19,4 +19,8 @@ public class MessageUtils {
 
     public static final String VALIDATION_PAGE_NUMBER = "pageNumber.invalid";
     public static final String VALIDATION_PAGE_SIZE = "pageSize.invalid";
+
+    private MessageUtils() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
 }

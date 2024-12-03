@@ -42,7 +42,7 @@ public class Driver {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(nullable = true, unique = true)
+    @Column(nullable = true)
     private String phone;
 
     @Column(name = "status", nullable = false)

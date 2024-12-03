@@ -19,7 +19,7 @@ public class PassengerConsumer {
             groupId = "#{@environment.getProperty('app.kafka.consumer.group-id')}"
     )
     public void handlePassengerCreated(NewUserDto newUserDto) {
-        log.info("Passenger received: {}", newUserDto);
+        log.info("Handling passenger created. Started. Passenger name = {}", newUserDto.firstName());
         passengerService.create(
                 PassengerCreateDto.builder()
                         .firstName(newUserDto.firstName())
