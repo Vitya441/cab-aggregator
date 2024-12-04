@@ -1,31 +1,30 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   application:
-    name: driver-service
+    name: passenger-service
   datasource:
-    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/driver_db}
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/passenger_db}
     username: ${DATASOURCE_USERNAME:vitya}
     password: ${DATASOURCE_PASSWORD:22817}
     driver-class-name: org.postgresql.Driver
 
+  liquibase:
+    change-log: db/changelog/db.changelog-master.xml
+
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  liquibase:
-    change-log: db/changelog/db.changelog-master.xml
-    enabled: true
-
 app:
   kafka:
     consumer:
-      topic: driver-topic
-      group-id: driver-group
+      topic: passenger-topic
+      group-id: passenger-group
       bootstrap-servers: localhost:9092
-      type-mappings: "by.modsen.keycloakservice.dto.NewUserDto:by.modsen.driverservice.kafka.NewUserDto"
+      type-mappings: "by.modsen.keycloakservice.dto.NewUserDto:by.modsen.passengerservice.kafka.NewUserDto"
+

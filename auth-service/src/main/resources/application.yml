@@ -20,3 +20,18 @@ app:
       clientId: spring-security
     realm: test-realm
     serverUrl: http://localhost:9090
+
+  kafka:
+    topics:
+      passenger:
+        name: passenger-topic
+        partitions: 1
+        replicas: 1
+      driver:
+        name: driver-topic
+        partitions: 1
+        replicas: 1
+
+    producer:
+      bootstrap-servers: localhost:9092
+

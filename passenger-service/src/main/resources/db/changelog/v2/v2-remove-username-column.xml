@@ -5,7 +5,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="v1-car-table.xml" relativeToChangelogFile="true"/>
-    <include file="v1-driver-table.xml" relativeToChangelogFile="true"/>
+    <changeSet id="2024-12-02:remove-username-column" author="Vitya441">
+        <dropColumn tableName="passenger" columnName="username"/>
+    </changeSet>
 
 </databaseChangeLog>

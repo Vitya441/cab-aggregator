@@ -37,7 +37,6 @@ public class PassengerController {
                 .body(service.create(passengerCreateDto));
     }
 
-    // Request param = ConstraintViolationException
     @GetMapping
     public ResponseEntity<PaginationDto<PassengerDto>> getAll(
             @RequestParam(defaultValue = "0") @Min(value = 0, message = MessageUtils.VALIDATION_PAGE_NUMBER) int page,

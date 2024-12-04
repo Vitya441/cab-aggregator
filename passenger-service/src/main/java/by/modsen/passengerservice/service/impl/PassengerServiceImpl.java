@@ -30,9 +30,19 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     public PassengerDto create(PassengerCreateDto passengerCreateDto) {
-        validator.validateUniqueness(passengerCreateDto);
         Passenger passenger = mapper.toPassenger(passengerCreateDto);
         Passenger savedPassenger = repository.save(passenger);
+
+        return mapper.toPassengerDto(savedPassenger);
+    }
+
+    @Override
+    public PassengerDto update(long id, PassengerUpdateDto passengerUpdateDto) {
+        Passenger currentPassenger = getPassengerByIdOrThrow(id);
+        validator.validateUniqueness(passengerUpdateDto, currentPassenger);
+        mapper.updatePassengerFromDto(passengerUpdateDto, currentPassenger);
+        Passenger savedPassenger = repository.save(currentPassenger);
+
         return mapper.toPassengerDto(savedPassenger);
     }
 
@@ -55,26 +65,18 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     public PassengerDto getById(long id) {
-        Passenger passenger = getOrThrow(id);
+        Passenger passenger = getPassengerByIdOrThrow(id);
+
         return mapper.toPassengerDto(passenger);
     }
 
     @Override
-    public PassengerDto update(long id, PassengerUpdateDto passengerUpdateDto) {
-        Passenger currentPassenger = getOrThrow(id);
-        validator.validateUniqueness(passengerUpdateDto, currentPassenger);
-        mapper.updatePassengerFromDto(passengerUpdateDto, currentPassenger);
-        Passenger savedPassenger = repository.save(currentPassenger);
-        return mapper.toPassengerDto(savedPassenger);
-    }
-
-    @Override
     public void deleteById(long id) {
-        getOrThrow(id);
+        getPassengerByIdOrThrow(id);
         repository.deleteById(id);
     }
 
-    private Passenger getOrThrow(long id) {
+    private Passenger getPassengerByIdOrThrow(long id) {
         return repository
                 .findById(id)
                 .orElseThrow(() -> new PassengerNotFoundException(MessageUtils.PASSENGER_NOT_FOUND_ERROR, id));

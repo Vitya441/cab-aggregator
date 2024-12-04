@@ -1,6 +1,6 @@
 package by.modsen.driverservice.util;
 
-public class ExceptionMessageKeyConstants {
+public final class ExceptionMessageKeyConstants {
 
     public static final String DRIVER_NOT_FOUND = "driver.notFound";
     public static final String CAR_NOT_FOUND = "car.notFound";
@@ -29,4 +29,8 @@ public class ExceptionMessageKeyConstants {
 
     public static final String VALIDATION_PAGE_NUMBER="page.number";
     public static final String VALIDATION_PAGE_SIZE="page.size";
+
+    private ExceptionMessageKeyConstants() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
 }

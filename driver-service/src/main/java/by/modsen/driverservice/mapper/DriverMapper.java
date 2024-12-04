@@ -1,6 +1,7 @@
 package by.modsen.driverservice.mapper;
 
 import by.modsen.driverservice.dto.request.DriverCreateDto;
+import by.modsen.driverservice.dto.request.DriverUpdateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
 import by.modsen.driverservice.entity.Driver;
@@ -23,6 +24,6 @@ public interface DriverMapper {
 
     List<DriverWithCarDto> toDriverWithCarDtoList(List<Driver> drivers);
 
-    void updateEntityFromDto(DriverCreateDto driverCreateDto, @MappingTarget Driver driver);
+    void updateEntityFromDto(DriverUpdateDto driverUpdateDto, @MappingTarget Driver driver);
 
 }

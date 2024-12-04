@@ -20,7 +20,7 @@
         <module>rides-service</module>
         <module>event-broker-service</module>
         <module>gateway-service</module>
-        <module>keycloak-service</module>
+        <module>auth-service</module>
     </modules>
 
     <packaging>pom</packaging>

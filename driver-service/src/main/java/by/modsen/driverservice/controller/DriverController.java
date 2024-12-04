@@ -1,6 +1,7 @@
 package by.modsen.driverservice.controller;
 
 import by.modsen.driverservice.dto.request.DriverCreateDto;
+import by.modsen.driverservice.dto.request.DriverUpdateDto;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
 import by.modsen.driverservice.dto.response.PaginationDto;
@@ -70,8 +71,8 @@ public class DriverController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DriverDto> update(@PathVariable Long id, @Valid @RequestBody DriverCreateDto driverCreateDto) {
-        return ResponseEntity.ok(driverService.update(id, driverCreateDto));
+    public ResponseEntity<DriverDto> update(@PathVariable Long id, @Valid @RequestBody DriverUpdateDto driverUpdateDto) {
+        return ResponseEntity.ok(driverService.update(id, driverUpdateDto));
     }
 
     @DeleteMapping("/{id}")
