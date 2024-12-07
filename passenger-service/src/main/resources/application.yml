@@ -28,3 +28,8 @@ app:
       bootstrap-servers: localhost:9092
       type-mappings: "by.modsen.keycloakservice.dto.NewUserDto:by.modsen.passengerservice.kafka.NewUserDto"
 
+# Мозолит глаза когда не включена Kafka
+logging:
+  level:
+    org.apache.kafka.clients.NetworkClient: ERROR
+    org.apache.kafka.clients: ERROR
