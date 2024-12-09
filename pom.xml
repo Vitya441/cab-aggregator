@@ -22,6 +22,7 @@
         <module>gateway-service</module>
         <module>auth-service</module>
         <module>common-module</module>
+        <module>eureka-server</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -32,6 +33,7 @@
         <mapstruct.version>1.6.0</mapstruct.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <springdoc.version>2.6.0</springdoc.version>
+        <common-module.version>0.0.1-SNAPSHOT</common-module.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

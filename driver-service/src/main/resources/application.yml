@@ -35,3 +35,8 @@ logging:
   level:
     org.apache.kafka.clients.NetworkClient: ERROR
     org.apache.kafka.clients: ERROR
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

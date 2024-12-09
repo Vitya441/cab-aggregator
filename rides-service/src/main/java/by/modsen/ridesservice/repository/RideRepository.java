@@ -2,18 +2,25 @@ package by.modsen.ridesservice.repository;
 
 import by.modsen.commonmodule.enumeration.RideStatus;
 import by.modsen.ridesservice.entity.Ride;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
 
-    Optional<Ride> findByPassengerIdAndStatusNot(Long passengerId, RideStatus excludedStatus);
+    boolean existsByPassengerIdAndStatusIn(Long passengerId, Collection<RideStatus> statuses);
 
-    boolean existsByPassengerIdAndStatusNot(Long passengerId, RideStatus excludedStatus);
+    Optional<Ride> findByPassengerIdAndStatusIn(Long passengerId, Collection<RideStatus> statuses);
 
-    Optional<Ride> findByIdAndStatusIs(Long id, RideStatus status);
+    Page<Ride> findAllByPassengerIdAndStatus(Long passengerId, RideStatus status, Pageable pageable);
+
+    Optional<Ride> findByPassengerIdAndStatusNot(Long passengerId, RideStatus status);
+
+    boolean existsByPassengerIdAndStatusNot(Long passengerId, RideStatus status);
 
 }

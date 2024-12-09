@@ -7,15 +7,23 @@ import by.modsen.commonmodule.dto.RideResponse;
 import by.modsen.commonmodule.enumeration.RideStatus;
 import by.modsen.ridesservice.client.DriverClient;
 import by.modsen.ridesservice.client.PassengerClient;
+import by.modsen.ridesservice.dto.PaginationDto;
 import by.modsen.ridesservice.entity.Ride;
 import by.modsen.ridesservice.exception.ActiveRideExistsException;
 import by.modsen.ridesservice.exception.NotFoundException;
 import by.modsen.ridesservice.mapper.RideMapper;
 import by.modsen.ridesservice.repository.RideRepository;
 import by.modsen.ridesservice.service.RideService;
+import by.modsen.ridesservice.util.RideStatusConstants;
+import by.modsen.ridesservice.util.RideValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +34,13 @@ public class RideServiceImpl implements RideService {
     private final RideMapper rideMapper;
     private final PassengerClient passengerClient;
     private final DriverClient driverClient;
+    private final RideValidator rideValidator;
 
     @Override
     public void requestRide(RideRequest rideRequest) {
         PassengerDto passengerDto = passengerClient.getPassengerById(rideRequest.passengerId());
-        log.info("Passenger ID = {}", passengerDto.id());
-
-        if (rideRepository.existsByPassengerIdAndStatusNot(passengerDto.id(), RideStatus.CANCELLED)) {
-            throw new ActiveRideExistsException("You already have an active ride");
+        if (rideRepository.existsByPassengerIdAndStatusNot(passengerDto.id(), RideStatus.COMPLETED)) {
+            throw new ActiveRideExistsException("You already have a current ride");
         }
         Ride ride = rideMapper.toEntity(rideRequest);
         rideRepository.save(ride);
@@ -43,26 +50,36 @@ public class RideServiceImpl implements RideService {
     public RideResponse getCurrentRide(Long passengerId) {
         PassengerDto passengerDto = passengerClient.getPassengerById(passengerId);
         Ride ride = rideRepository
-                .findByPassengerIdAndStatusNot(
-                        passengerDto.id(),
-                        RideStatus.CANCELLED)
+                .findByPassengerIdAndStatusIn(passengerDto.id(), RideStatusConstants.ACTIVE_STATUSES)
                 .orElseThrow(() -> new NotFoundException("You dont have an active ride"));
 
         return rideMapper.toDto(ride);
     }
 
     @Override
+    public PaginationDto<RideResponse> getRidesHistory(Long passengerId, int page, int size, String sortField) {
+        PassengerDto passengerDto = passengerClient.getPassengerById(passengerId);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
+
+        Page<Ride> ridesPage = rideRepository.findAllByPassengerIdAndStatus(passengerDto.id(), RideStatus.COMPLETED, pageRequest);
+        List<RideResponse> data = ridesPage.getContent().stream()
+                .map(rideMapper::toDto)
+                .toList();
+
+        return new PaginationDto<>(
+                data,
+                ridesPage.getNumber(),
+                ridesPage.getSize(),
+                ridesPage.getTotalElements(),
+                ridesPage.getTotalPages()
+        );
+    }
+
+    @Override
     public void confirmRide(Long rideId, Long driverId) {
-        Ride ride = rideRepository
-                .findById(rideId)
-                .orElseThrow(() -> new NotFoundException("Ride with this id not found"));
-
+        Ride ride = getRideByIdOrThrow(rideId);
         DriverDto driverDto = driverClient.getDriverById(driverId);
-
-        if (ride.getStatus() != RideStatus.REQUESTED && ride.getStatus() != RideStatus.CANCELLED) {
-            throw new NotFoundException("Ride is not waiting for a driver");
-        }
-
+        rideValidator.validateConfirmation(ride);
         ride.setDriverId(driverDto.id());
         ride.setStatus(RideStatus.ACCEPTED);
         rideRepository.save(ride);
@@ -70,14 +87,34 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public void rejectRide(Long rideId, Long driverId) {
-        Ride ride = rideRepository
-                .findById(rideId)
-                .orElseThrow(() -> new NotFoundException("Ride with this id not found"));
-
+        Ride ride = getRideByIdOrThrow(rideId);
         DriverDto driverDto = driverClient.getDriverById(driverId);
-
+        rideValidator.validateRejection(ride);
         ride.setStatus(RideStatus.CANCELLED);
         rideRepository.save(ride);
     }
 
+    @Override
+    public void startRide(Long rideId, Long driverId) {
+        Ride ride = getRideByIdOrThrow(rideId);
+        DriverDto driverDto = driverClient.getDriverById(driverId);
+        rideValidator.validateStarting(driverDto, ride);
+        ride.setStatus(RideStatus.IN_PROGRESS);
+        rideRepository.save(ride);
+    }
+
+    @Override
+    public void endRide(Long rideId, Long driverId) {
+        Ride ride = getRideByIdOrThrow(rideId);
+        DriverDto driverDto = driverClient.getDriverById(driverId);
+        rideValidator.validateEnding(driverDto, ride);
+        ride.setStatus(RideStatus.COMPLETED);
+        rideRepository.save(ride);
+    }
+
+    private Ride getRideByIdOrThrow(Long rideId) {
+        return rideRepository
+                .findById(rideId)
+                .orElseThrow(() -> new NotFoundException("Ride with this id not found"));
+    }
 }
