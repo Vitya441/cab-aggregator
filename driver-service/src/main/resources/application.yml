@@ -29,3 +29,14 @@ app:
       group-id: driver-group
       bootstrap-servers: localhost:9092
       type-mappings: "by.modsen.keycloakservice.dto.NewUserDto:by.modsen.driverservice.kafka.NewUserDto"
+
+# Мозолит глаза когда не включена Kafka
+logging:
+  level:
+    org.apache.kafka.clients.NetworkClient: ERROR
+    org.apache.kafka.clients: ERROR
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
