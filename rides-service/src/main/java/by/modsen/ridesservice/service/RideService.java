@@ -10,7 +10,9 @@ public interface RideService {
 
     RideResponse getCurrentRide(Long passengerId);
 
-    PaginationDto<RideResponse> getRidesHistory(Long passengerId, int page, int size, String sortField);
+    PaginationDto<RideResponse> getHistoryByPassengerId(Long passengerId, int page, int size, String sortField);
+
+    PaginationDto<RideResponse> getHistoryByDriverId(Long passengerId, int page, int size, String sortField);
 
     void confirmRide(Long rideId, Long driverId);
 

@@ -35,9 +35,9 @@ public class RideController {
         return ResponseEntity.ok(rideService.getCurrentRide(passengerId));
     }
 
-    @GetMapping("/history")
-    public ResponseEntity<PaginationDto<RideResponse>> getRidesHistory(
-            @RequestParam
+    @GetMapping("/passenger/history/{passengerId}")
+    public ResponseEntity<PaginationDto<RideResponse>> getHistoryByPassengerId(
+            @PathVariable
             Long passengerId,
             @RequestParam(defaultValue = "0") @Min(value = 0, message = "Min value is 0")
             int page,
@@ -46,7 +46,21 @@ public class RideController {
             @RequestParam(name = "sort", defaultValue = "id")
             String sortField
     ) {
-        return ResponseEntity.ok(rideService.getRidesHistory(passengerId, page, size, sortField));
+        return ResponseEntity.ok(rideService.getHistoryByPassengerId(passengerId, page, size, sortField));
+    }
+
+    @GetMapping("/driver/history/{driverId}")
+    public ResponseEntity<PaginationDto<RideResponse>> getHistoryByDriverId(
+            @PathVariable
+            Long driverId,
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Min value is 0")
+            int page,
+            @RequestParam(defaultValue = "15") @Min(value = 1, message = "Min value is 1")
+            int size,
+            @RequestParam(name = "sort", defaultValue = "id")
+            String sortField
+    ) {
+        return ResponseEntity.ok(rideService.getHistoryByDriverId(driverId, page, size, sortField));
     }
 
     @PutMapping("/{rideId}/confirm")
