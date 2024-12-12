@@ -1,0 +1,28 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: rides-service
+
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/ride_db}
+    username: ${DATASOURCE_USERNAME:vitya}
+    password: ${DATASOURCE_PASSWORD:22817}
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    change-log: db/changelog/db.changelog-master.xml
+    enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
