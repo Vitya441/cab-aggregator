@@ -2,9 +2,12 @@ package by.modsen.ratingservice.service.impl;
 
 import by.modsen.ratingservice.dto.response.PassengerRatingResponse;
 import by.modsen.ratingservice.entity.PassengerRating;
+import by.modsen.ratingservice.exception.RatingAlreadyExistsException;
+import by.modsen.ratingservice.exception.RatingNotFoundException;
 import by.modsen.ratingservice.mapper.PassengerRatingMapper;
 import by.modsen.ratingservice.repository.PassengerRatingRepository;
 import by.modsen.ratingservice.service.PassengerRatingService;
+import by.modsen.ratingservice.util.ExceptionMessageConstants;
 import by.modsen.ratingservice.util.RatingConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +32,6 @@ public class PassengerRatingServiceImpl implements PassengerRatingService {
         return mapper.toDto(passengerRating);
     }
 
-    // TODO: Заменить DTO на примитивы
     @Override
     public PassengerRatingResponse updateRatingRecord(Long passengerId, double rating) {
         PassengerRating passengerRating = getRatingByPassengerIdOrThrow(passengerId);
@@ -61,13 +63,12 @@ public class PassengerRatingServiceImpl implements PassengerRatingService {
     private PassengerRating getRatingByPassengerIdOrThrow(Long passengerId) {
         return repository
                 .findByPassengerId(passengerId)
-                .orElseThrow(() -> new RuntimeException("Passenger rating record not found"));
+                .orElseThrow(() -> new RatingNotFoundException(ExceptionMessageConstants.PASSENGER_RATING_NOT_FOUND, passengerId));
     }
 
     private void checkPassengerRatingExist(Long passengerId) {
         if (repository.existsByPassengerId(passengerId)) {
-            throw new RuntimeException("Passenger rating record already exist");
+            throw new RatingAlreadyExistsException(ExceptionMessageConstants.PASSENGER_RATING_EXISTS, passengerId);
         }
     }
-
 }

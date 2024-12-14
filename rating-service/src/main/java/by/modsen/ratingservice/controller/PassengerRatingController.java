@@ -2,6 +2,7 @@ package by.modsen.ratingservice.controller;
 
 import by.modsen.ratingservice.dto.response.PassengerRatingResponse;
 import by.modsen.ratingservice.service.PassengerRatingService;
+import by.modsen.ratingservice.util.ExceptionMessageConstants;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -48,8 +49,8 @@ public class PassengerRatingController {
             @PathVariable
             Long passengerId,
             @RequestParam
-            @Min(value = 1, message = "Rating can't be less than 1")
-            @Max(value = 5, message = "Rating can't be greater than 5")
+            @Min(value = 1, message = ExceptionMessageConstants.VALIDATION_RATING_MIN)
+            @Max(value = 5, message = ExceptionMessageConstants.VALIDATION_RATING_MAX)
             double rating
     ) {
         return ResponseEntity.ok(passengerRatingService.updateRatingRecord(passengerId, rating));

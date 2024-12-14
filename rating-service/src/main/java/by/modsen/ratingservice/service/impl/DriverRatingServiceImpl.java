@@ -2,9 +2,12 @@ package by.modsen.ratingservice.service.impl;
 
 import by.modsen.ratingservice.dto.response.DriverRatingResponse;
 import by.modsen.ratingservice.entity.DriverRating;
+import by.modsen.ratingservice.exception.RatingAlreadyExistsException;
+import by.modsen.ratingservice.exception.RatingNotFoundException;
 import by.modsen.ratingservice.mapper.DriverRatingMapper;
 import by.modsen.ratingservice.repository.DriverRatingRepository;
 import by.modsen.ratingservice.service.DriverRatingService;
+import by.modsen.ratingservice.util.ExceptionMessageConstants;
 import by.modsen.ratingservice.util.RatingConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,17 +63,15 @@ public class DriverRatingServiceImpl implements DriverRatingService {
         return mapper.toDtoList(repository.findAll());
     }
 
-
     private DriverRating getRecordByDriverIdOrThrow(Long driverId) {
         return repository
                 .findByDriverId(driverId)
-                .orElseThrow(() -> new RuntimeException("Driver rating record not found"));
+                .orElseThrow(() -> new RatingNotFoundException(ExceptionMessageConstants.DRIVER_RATING_NOT_FOUND, driverId));
     }
 
     private void checkDriverRatingExist(Long driverId) {
         if (repository.existsByDriverId(driverId)) {
-            throw new RuntimeException("Driver rating record already exist");
+            throw new RatingAlreadyExistsException(ExceptionMessageConstants.DRIVER_RATING_EXISTS, driverId);
         }
     }
-
 }
