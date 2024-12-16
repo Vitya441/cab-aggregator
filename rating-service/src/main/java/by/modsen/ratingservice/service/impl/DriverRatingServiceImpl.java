@@ -1,5 +1,7 @@
 package by.modsen.ratingservice.service.impl;
 
+import by.modsen.ratingservice.dto.response.DriverRatingListResponse;
+import by.modsen.ratingservice.dto.response.DriverRatingPage;
 import by.modsen.ratingservice.dto.response.DriverRatingResponse;
 import by.modsen.ratingservice.entity.DriverRating;
 import by.modsen.ratingservice.exception.RatingAlreadyExistsException;
@@ -11,6 +13,9 @@ import by.modsen.ratingservice.util.ExceptionMessageConstants;
 import by.modsen.ratingservice.util.RatingConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +37,7 @@ public class DriverRatingServiceImpl implements DriverRatingService {
 
     @Override
     public DriverRatingResponse createRatingRecord(Long driverId) {
-        checkDriverRatingExist(driverId);
+        checkDriverRatingDoesntExist(driverId);
         DriverRating driverRating = new DriverRating();
 
         driverRating.setDriverId(driverId);
@@ -59,8 +64,24 @@ public class DriverRatingServiceImpl implements DriverRatingService {
     }
 
     @Override
-    public List<DriverRatingResponse> getAllRatingRecords() {
-        return mapper.toDtoList(repository.findAll());
+    public DriverRatingListResponse getAllRatingRecords() {
+        List<DriverRatingResponse> ratings = mapper.toDtoList(repository.findAll());
+        return new DriverRatingListResponse(ratings);
+    }
+
+    @Override
+    public DriverRatingPage getRatingsPage(int page, int size, String sortField) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
+        Page<DriverRatingResponse> ratingPage = repository
+                .findAll(pageRequest)
+                .map(mapper::toDto);
+
+        return DriverRatingPage.builder()
+                .ratings(ratingPage.getContent())
+                .currentPage(ratingPage.getNumber())
+                .totalPages(ratingPage.getTotalPages())
+                .totalElements(ratingPage.getTotalElements())
+                .build();
     }
 
     private DriverRating getRecordByDriverIdOrThrow(Long driverId) {
@@ -69,7 +90,7 @@ public class DriverRatingServiceImpl implements DriverRatingService {
                 .orElseThrow(() -> new RatingNotFoundException(ExceptionMessageConstants.DRIVER_RATING_NOT_FOUND, driverId));
     }
 
-    private void checkDriverRatingExist(Long driverId) {
+    private void checkDriverRatingDoesntExist(Long driverId) {
         if (repository.existsByDriverId(driverId)) {
             throw new RatingAlreadyExistsException(ExceptionMessageConstants.DRIVER_RATING_EXISTS, driverId);
         }

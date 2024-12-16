@@ -1,7 +1,8 @@
 package by.modsen.ratingservice.service;
 
+import by.modsen.ratingservice.dto.response.PassengerRatingListResponse;
+import by.modsen.ratingservice.dto.response.PassengerRatingPage;
 import by.modsen.ratingservice.dto.response.PassengerRatingResponse;
-import java.util.List;
 
 public interface PassengerRatingService {
 
@@ -11,7 +12,9 @@ public interface PassengerRatingService {
 
     PassengerRatingResponse getRatingByPassengerId(Long passengerId);
 
-    List<PassengerRatingResponse> getAllRatingRecords();
+    PassengerRatingListResponse getAllRatingRecords();
+
+    PassengerRatingPage getRatingsPage(int page, int size, String sortField);
 
     void deleteRatingRecord(Long passengerId);
 

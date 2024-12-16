@@ -1,8 +1,8 @@
 package by.modsen.ratingservice.service;
 
+import by.modsen.ratingservice.dto.response.DriverRatingListResponse;
+import by.modsen.ratingservice.dto.response.DriverRatingPage;
 import by.modsen.ratingservice.dto.response.DriverRatingResponse;
-
-import java.util.List;
 
 public interface DriverRatingService {
 
@@ -12,7 +12,9 @@ public interface DriverRatingService {
 
     DriverRatingResponse getRatingByDriverId(Long driverId);
 
-    List<DriverRatingResponse> getAllRatingRecords();
+    DriverRatingListResponse getAllRatingRecords();
+
+    DriverRatingPage getRatingsPage(int page, int size, String sortField);
 
     void deleteRatingRecord(Long driverId);
 

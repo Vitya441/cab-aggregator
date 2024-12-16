@@ -60,12 +60,6 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>by.modsen</groupId>-->
-<!--            <artifactId>common-module</artifactId>-->
-<!--            <version>${common-module.version}</version>-->
-<!--        </dependency>-->
-
 
     </dependencies>
 

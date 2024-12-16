@@ -1,5 +1,7 @@
 package by.modsen.ratingservice.controller;
 
+import by.modsen.ratingservice.dto.response.DriverRatingListResponse;
+import by.modsen.ratingservice.dto.response.DriverRatingPage;
 import by.modsen.ratingservice.dto.response.DriverRatingResponse;
 import by.modsen.ratingservice.service.DriverRatingService;
 import by.modsen.ratingservice.util.ExceptionMessageConstants;
@@ -18,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("api/v1/ratings/drivers")
 @RequiredArgsConstructor
@@ -29,8 +29,20 @@ public class DriverRatingController {
     private final DriverRatingService driverRatingService;
 
     @GetMapping
-    public ResponseEntity<List<DriverRatingResponse>> getAllRecords() {
+    public ResponseEntity<DriverRatingListResponse> getAllRecords() {
         return ResponseEntity.ok(driverRatingService.getAllRatingRecords());
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<DriverRatingPage> getRatingsPage(
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = ExceptionMessageConstants.VALIDATION_PAGE_NUMBER_MIN)
+            int page,
+            @RequestParam(defaultValue = "15") @Min(value = 1, message = ExceptionMessageConstants.VALIDATION_PAGE_SIZE_MIN)
+            int size,
+            @RequestParam(defaultValue = "id")
+            String sortField
+    ) {
+        return ResponseEntity.ok(driverRatingService.getRatingsPage(page, size, sortField));
     }
 
     @GetMapping("/{driverId}")

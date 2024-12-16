@@ -1,5 +1,7 @@
 package by.modsen.ratingservice.service.impl;
 
+import by.modsen.ratingservice.dto.response.PassengerRatingListResponse;
+import by.modsen.ratingservice.dto.response.PassengerRatingPage;
 import by.modsen.ratingservice.dto.response.PassengerRatingResponse;
 import by.modsen.ratingservice.entity.PassengerRating;
 import by.modsen.ratingservice.exception.RatingAlreadyExistsException;
@@ -10,6 +12,9 @@ import by.modsen.ratingservice.service.PassengerRatingService;
 import by.modsen.ratingservice.util.ExceptionMessageConstants;
 import by.modsen.ratingservice.util.RatingConstants;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +28,7 @@ public class PassengerRatingServiceImpl implements PassengerRatingService {
 
     @Override
     public PassengerRatingResponse createRatingRecord(Long passengerId) {
-        checkPassengerRatingExist(passengerId);
+        checkPassengerRatingDoesntExist(passengerId);
         PassengerRating passengerRating = new PassengerRating();
         passengerRating.setPassengerId(passengerId);
         passengerRating.setRate(RatingConstants.DEFAULT_RATE);
@@ -50,8 +55,25 @@ public class PassengerRatingServiceImpl implements PassengerRatingService {
     }
 
     @Override
-    public List<PassengerRatingResponse> getAllRatingRecords() {
-        return mapper.toDtoList(repository.findAll());
+    public PassengerRatingListResponse getAllRatingRecords() {
+        List<PassengerRatingResponse> ratings = mapper.toDtoList(repository.findAll());
+
+        return new PassengerRatingListResponse(ratings);
+    }
+
+    @Override
+    public PassengerRatingPage getRatingsPage(int page, int size, String sortField) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
+        Page<PassengerRatingResponse> ratingPage = repository
+                .findAll(pageRequest)
+                .map(mapper::toDto);
+
+        return PassengerRatingPage.builder()
+                .ratings(ratingPage.getContent())
+                .currentPage(ratingPage.getNumber())
+                .totalPages(ratingPage.getTotalPages())
+                .totalElements(ratingPage.getTotalElements())
+                .build();
     }
 
     @Override
@@ -66,7 +88,7 @@ public class PassengerRatingServiceImpl implements PassengerRatingService {
                 .orElseThrow(() -> new RatingNotFoundException(ExceptionMessageConstants.PASSENGER_RATING_NOT_FOUND, passengerId));
     }
 
-    private void checkPassengerRatingExist(Long passengerId) {
+    private void checkPassengerRatingDoesntExist(Long passengerId) {
         if (repository.existsByPassengerId(passengerId)) {
             throw new RatingAlreadyExistsException(ExceptionMessageConstants.PASSENGER_RATING_EXISTS, passengerId);
         }
