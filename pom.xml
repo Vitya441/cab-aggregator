@@ -23,6 +23,7 @@
         <module>auth-service</module>
         <module>common-module</module>
         <module>eureka-server</module>
+        <module>rating-service</module>
     </modules>
 
     <packaging>pom</packaging>
