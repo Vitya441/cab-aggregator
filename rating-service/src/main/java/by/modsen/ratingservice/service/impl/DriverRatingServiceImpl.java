@@ -60,24 +60,26 @@ public class DriverRatingServiceImpl implements DriverRatingService {
     @Override
     public void deleteRatingRecord(Long driverId) {
         DriverRating driverRating = getRecordByDriverIdOrThrow(driverId);
+
         repository.delete(driverRating);
     }
 
     @Override
     public DriverRatingListResponse getAllRatingRecords() {
-        List<DriverRatingResponse> ratings = mapper.toDtoList(repository.findAll());
-        return new DriverRatingListResponse(ratings);
+        List<DriverRating> ratings = repository.findAll();
+        List<DriverRatingResponse> ratingResponses = mapper.toDtoList(ratings);
+
+        return new DriverRatingListResponse(ratingResponses);
     }
 
     @Override
     public DriverRatingPage getRatingsPage(int page, int size, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
-        Page<DriverRatingResponse> ratingPage = repository
-                .findAll(pageRequest)
-                .map(mapper::toDto);
+        Page<DriverRating> ratingPage = repository.findAll(pageRequest);
+        List<DriverRatingResponse> responseList = mapper.toDtoList(ratingPage.getContent());
 
         return DriverRatingPage.builder()
-                .ratings(ratingPage.getContent())
+                .ratings(responseList)
                 .currentPage(ratingPage.getNumber())
                 .totalPages(ratingPage.getTotalPages())
                 .totalElements(ratingPage.getTotalElements())

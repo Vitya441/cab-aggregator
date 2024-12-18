@@ -56,20 +56,20 @@ public class PassengerRatingServiceImpl implements PassengerRatingService {
 
     @Override
     public PassengerRatingListResponse getAllRatingRecords() {
-        List<PassengerRatingResponse> ratings = mapper.toDtoList(repository.findAll());
+        List<PassengerRating> ratings = repository.findAll();
+        List<PassengerRatingResponse> ratingResponses = mapper.toDtoList(ratings);
 
-        return new PassengerRatingListResponse(ratings);
+        return new PassengerRatingListResponse(ratingResponses);
     }
 
     @Override
     public PassengerRatingPage getRatingsPage(int page, int size, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
-        Page<PassengerRatingResponse> ratingPage = repository
-                .findAll(pageRequest)
-                .map(mapper::toDto);
+        Page<PassengerRating> ratingPage = repository.findAll(pageRequest);
+        List<PassengerRatingResponse> responseList = mapper.toDtoList(ratingPage.getContent());
 
         return PassengerRatingPage.builder()
-                .ratings(ratingPage.getContent())
+                .ratings(responseList)
                 .currentPage(ratingPage.getNumber())
                 .totalPages(ratingPage.getTotalPages())
                 .totalElements(ratingPage.getTotalElements())
