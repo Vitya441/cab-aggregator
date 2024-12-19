@@ -22,19 +22,27 @@ spring:
     change-log: db/changelog/db.changelog-master.xml
     enabled: true
 
+
+  kafka:
+      bootstrap-servers: localhost:29092
+
 app:
   kafka:
     consumer:
       topic: driver-topic
       group-id: driver-group
-      bootstrap-servers: localhost:9092
       type-mappings: "by.modsen.keycloakservice.dto.NewUserDto:by.modsen.driverservice.kafka.NewUserDto"
+    consumer-2:
+      topic: requested-rides-topic
+      group-id: driver-group
+    producer:
+      topic: available-drivers-topic
 
-# Мозолит глаза когда не включена Kafka
-logging:
-  level:
-    org.apache.kafka.clients.NetworkClient: ERROR
-    org.apache.kafka.clients: ERROR
+## Мозолит глаза когда не включена Kafka
+#logging:
+#  level:
+#    org.apache.kafka.clients.NetworkClient: ERROR
+#    org.apache.kafka.clients: ERROR
 
 eureka:
   client:
