@@ -15,8 +15,8 @@ public class PassengerConsumer {
     private final PassengerService passengerService;
 
     @KafkaListener(
-            topics = "#{@environment.getProperty('app.kafka.consumer.topic')}",
-            groupId = "#{@environment.getProperty('app.kafka.consumer.group-id')}"
+            topics = "${app.kafka.consumer.topic}",
+            groupId = "${app.kafka.consumer.group-id}"
     )
     public void handlePassengerCreated(NewUserDto newUserDto) {
         log.info("Handling passenger created. Started. Passenger name = {}", newUserDto.firstName());
@@ -26,6 +26,5 @@ public class PassengerConsumer {
                         .lastName(newUserDto.lastName())
                         .build()
         );
-
     }
 }

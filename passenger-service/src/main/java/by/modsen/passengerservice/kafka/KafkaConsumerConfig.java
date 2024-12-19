@@ -21,7 +21,7 @@ public class KafkaConsumerConfig {
     private final String typeMappings;
 
     public KafkaConsumerConfig(
-            @Value("${app.kafka.consumer.bootstrap-servers}")
+            @Value("${spring.kafka.bootstrap-servers}")
             String bootstrapServers,
             @Value("${app.kafka.consumer.group-id}")
             String groupId,
