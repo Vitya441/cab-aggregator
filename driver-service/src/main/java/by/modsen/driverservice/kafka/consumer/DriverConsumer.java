@@ -1,6 +1,7 @@
-package by.modsen.driverservice.kafka;
+package by.modsen.driverservice.kafka.consumer;
 
 import by.modsen.driverservice.dto.request.DriverCreateDto;
+import by.modsen.driverservice.kafka.NewUserDto;
 import by.modsen.driverservice.service.DriverService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +16,9 @@ public class DriverConsumer {
     private final DriverService driverService;
 
     @KafkaListener(
-            topics = "#{@environment.getProperty('app.kafka.consumer.topic')}",
-            groupId = "#{@environment.getProperty('app.kafka.consumer.group-id')}"
+            topics = "${app.kafka.consumer.topic}",
+            groupId = "${app.kafka.consumer.group-id}",
+            containerFactory = "driverKafkaListenerContainerFactory"
     )
     public void handleDriverCreated(NewUserDto newUserDto) {
         log.info("Handling driver created. Started. Driver name = {}", newUserDto.firstName());

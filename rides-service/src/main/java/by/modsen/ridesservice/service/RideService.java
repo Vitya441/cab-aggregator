@@ -8,6 +8,8 @@ public interface RideService {
 
     void requestRide(RideRequest rideRequest);
 
+    void assignDriverToRide(Long driverId, Long rideId);
+
     RideResponse getCurrentRide(Long passengerId);
 
     PaginationDto<RideResponse> getHistoryByPassengerId(Long passengerId, int page, int size, String sortField);

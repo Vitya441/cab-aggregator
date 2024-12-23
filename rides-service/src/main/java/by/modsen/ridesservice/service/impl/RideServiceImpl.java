@@ -2,6 +2,7 @@ package by.modsen.ridesservice.service.impl;
 
 import by.modsen.commonmodule.dto.DriverDto;
 import by.modsen.commonmodule.dto.PassengerDto;
+import by.modsen.commonmodule.dto.RequestedRideEvent;
 import by.modsen.commonmodule.dto.RideRequest;
 import by.modsen.commonmodule.dto.RideResponse;
 import by.modsen.commonmodule.enumeration.RideStatus;
@@ -11,6 +12,7 @@ import by.modsen.ridesservice.dto.PaginationDto;
 import by.modsen.ridesservice.entity.Ride;
 import by.modsen.ridesservice.exception.ActiveRideExistsException;
 import by.modsen.ridesservice.exception.NotFoundException;
+import by.modsen.ridesservice.kafka.producer.RequestedRidesProducer;
 import by.modsen.ridesservice.mapper.RideMapper;
 import by.modsen.ridesservice.repository.RideRepository;
 import by.modsen.ridesservice.service.RideService;
@@ -36,6 +38,7 @@ public class RideServiceImpl implements RideService {
     private final PassengerClient passengerClient;
     private final DriverClient driverClient;
     private final RideValidator rideValidator;
+    private final RequestedRidesProducer ridesProducer;
 
     @Override
     public void requestRide(RideRequest rideRequest) {
@@ -44,6 +47,24 @@ public class RideServiceImpl implements RideService {
             throw new ActiveRideExistsException(ExceptionMessageConstants.ACTIVE_RIDE_EXISTS);
         }
         Ride ride = rideMapper.toEntity(rideRequest);
+        ride = rideRepository.save(ride);
+
+        RequestedRideEvent rideEvent = RequestedRideEvent.builder()
+                .rideId(ride.getId())
+                .pickupAddress(ride.getPickupAddress())
+                .build();
+
+        ridesProducer.sendEvent(rideEvent);
+    }
+
+    /**
+     * Водитель должен будет через REST подтвердить либо отклонить
+     */
+    @Override
+    public void assignDriverToRide(Long driverId, Long rideId) {
+        Ride ride = getRideByIdOrThrow(rideId);
+        ride.setDriverId(driverId);
+
         rideRepository.save(ride);
     }
 

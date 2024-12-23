@@ -11,6 +11,13 @@ spring:
         jwt:
           issuer-uri: ${app.keycloak.serverUrl}/realms/${app.keycloak.realm}
 
+
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    bootstrap-servers: localhost:29092
+
 app:
   keycloak:
     admin:
@@ -32,6 +39,4 @@ app:
         partitions: 1
         replicas: 1
 
-    producer:
-      bootstrap-servers: localhost:9092
 
