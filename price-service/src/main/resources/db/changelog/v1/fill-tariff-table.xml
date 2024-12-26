@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        logicalFilePath="classpath:db/changelog/db.changelog-master.xml">
+
+    <changeSet id="2024-12-24:fill-table" author="Vitya441">
+
+        <insert tableName="tariff">
+            <column name="car_category" value="ECONOMY"/>
+            <column name="cost_per_km" value="10.00"/>
+        </insert>
+
+        <insert tableName="tariff">
+            <column name="car_category" value="COMFORT"/>
+            <column name="cost_per_km" value="15.00"/>
+        </insert>
+
+        <insert tableName="tariff">
+            <column name="car_category" value="BUSINESS"/>
+            <column name="cost_per_km" value="20.00"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>

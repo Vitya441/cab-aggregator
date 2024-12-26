@@ -24,6 +24,7 @@
         <module>common-module</module>
         <module>eureka-server</module>
         <module>rating-service</module>
+        <module>price-service</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -38,7 +39,6 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
     </properties>
 
     <dependencyManagement>

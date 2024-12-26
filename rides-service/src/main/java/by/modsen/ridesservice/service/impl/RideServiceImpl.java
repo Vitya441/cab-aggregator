@@ -150,6 +150,9 @@ public class RideServiceImpl implements RideService {
         DriverDto driverDto = driverClient.getDriverById(driverId);
         rideValidator.validateEnding(driverDto, ride);
         ride.setStatus(RideStatus.COMPLETED);
+
+        Long duration = ride.getDuration();
+
         rideRepository.save(ride);
     }
 

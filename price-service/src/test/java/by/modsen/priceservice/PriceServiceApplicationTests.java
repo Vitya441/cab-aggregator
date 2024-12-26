@@ -1,10 +1,10 @@
-package by.modsen.commonmodule;
+package by.modsen.priceservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CommonModuleApplicationTests {
+class PriceServiceApplicationTests {
 
     @Test
     void contextLoads() {
