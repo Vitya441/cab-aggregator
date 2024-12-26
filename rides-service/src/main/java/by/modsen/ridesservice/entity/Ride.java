@@ -18,6 +18,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
@@ -68,4 +69,12 @@ public class Ride {
     protected void onCreate() {
         this.status = RideStatus.REQUESTED;
     }
+
+    /**
+     * Длительность поездки в минутах
+     */
+    public Long getDuration() {
+        return Duration.between(startTime, endTime).toMinutes();
+    }
+
 }

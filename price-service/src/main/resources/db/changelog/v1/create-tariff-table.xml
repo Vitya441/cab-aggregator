@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        logicalFilePath="classpath:db/changelog/db.changelog-master.xml">
+
+    <changeSet id="2024-12-24:create-table" author="Vitya441">
+        <createTable tableName="tariff">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="car_category" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cost_per_km" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <createIndex tableName="tariff" indexName="idx_tariff_car_category">
+            <column name="car_category"/>
+        </createIndex>
+        
+        
+    </changeSet>
+    
+</databaseChangeLog>
