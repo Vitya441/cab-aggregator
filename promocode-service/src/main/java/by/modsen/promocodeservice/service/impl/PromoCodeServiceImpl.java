@@ -5,9 +5,12 @@ import by.modsen.promocodeservice.dto.PromoCodeRequest;
 import by.modsen.promocodeservice.dto.PromoCodeResponse;
 import by.modsen.promocodeservice.dto.PromoCodeResponseList;
 import by.modsen.promocodeservice.entity.PromoCode;
+import by.modsen.promocodeservice.exception.CodeAlreadyExistsException;
+import by.modsen.promocodeservice.exception.PromoCodeNotFoundException;
 import by.modsen.promocodeservice.mapper.PromoCodeMapper;
 import by.modsen.promocodeservice.repository.PromoCodeRepository;
 import by.modsen.promocodeservice.service.PromoCodeService;
+import by.modsen.promocodeservice.util.ExceptionMessageConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +37,9 @@ public class PromoCodeServiceImpl implements PromoCodeService {
     public PromoCodeResponse getByCode(String code) {
         PromoCode promoCode = repository
                 .findByCode(code)
-                .orElseThrow(() -> new RuntimeException("Promo code not found"));
+                .orElseThrow(() -> new PromoCodeNotFoundException(
+                        ExceptionMessageConstants.PROMOCODE_WITH_CODE_NOT_FOUND, code
+                ));
 
         return mapper.toDto(promoCode);
     }
@@ -63,7 +68,7 @@ public class PromoCodeServiceImpl implements PromoCodeService {
     @Override
     public PromoCodeResponse create(PromoCodeRequest promoCodeRequest) {
         if (repository.existsByCode(promoCodeRequest.code())) {
-            throw new RuntimeException("Promo code with this code already exists");
+            throw new CodeAlreadyExistsException(ExceptionMessageConstants.PROMOCODE_WITH_CODE_EXISTS, promoCodeRequest.code());
         }
         PromoCode promoCode = mapper.toEntity(promoCodeRequest);
         promoCode = repository.save(promoCode);
@@ -74,10 +79,7 @@ public class PromoCodeServiceImpl implements PromoCodeService {
     @Override
     public PromoCodeResponse update(String id, PromoCodeRequest promoCodeRequest) {
         PromoCode promoCode = getPromoCodeByIdOrThrow(id);
-        if (!promoCodeRequest.code().equals(promoCode.getCode())
-                && repository.existsByCode(promoCodeRequest.code())) {
-            throw new RuntimeException("Promo code with this code already exists");
-        }
+        checkPossibilityToUpdate(promoCode, promoCodeRequest);
         mapper.updateEntityFromDto(promoCodeRequest, promoCode);
         promoCode = repository.save(promoCode);
 
@@ -87,7 +89,7 @@ public class PromoCodeServiceImpl implements PromoCodeService {
     @Override
     public void deleteById(String id) {
         if (!repository.existsById(id)) {
-            throw new RuntimeException("Promo code with this ID does not exist");
+            throw new PromoCodeNotFoundException(ExceptionMessageConstants.PROMOCODE_WITH_ID_NOT_FOUND, id);
         }
         repository.deleteById(id);
     }
@@ -95,6 +97,15 @@ public class PromoCodeServiceImpl implements PromoCodeService {
     private PromoCode getPromoCodeByIdOrThrow(String id) {
         return repository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Promo code not found"));
+                .orElseThrow(() -> new PromoCodeNotFoundException(
+                        ExceptionMessageConstants.PROMOCODE_WITH_ID_NOT_FOUND, id
+                ));
+    }
+
+    private void checkPossibilityToUpdate(PromoCode promoCode, PromoCodeRequest promoCodeRequest) {
+        if (!promoCodeRequest.code().equals(promoCode.getCode())
+                && repository.existsByCode(promoCodeRequest.code())) {
+            throw new CodeAlreadyExistsException(ExceptionMessageConstants.PROMOCODE_WITH_CODE_EXISTS, promoCodeRequest.code());
+        }
     }
 }

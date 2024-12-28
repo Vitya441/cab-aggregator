@@ -5,10 +5,13 @@ import by.modsen.promocodeservice.dto.PromoCodeRequest;
 import by.modsen.promocodeservice.dto.PromoCodeResponse;
 import by.modsen.promocodeservice.dto.PromoCodeResponseList;
 import by.modsen.promocodeservice.service.PromoCodeService;
+import by.modsen.promocodeservice.util.ExceptionMessageConstants;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/promocode")
 @RequiredArgsConstructor
+@Validated
 public class PromoCodeController {
 
     private final PromoCodeService promoCodeService;
@@ -43,9 +47,9 @@ public class PromoCodeController {
 
     @GetMapping("/page")
     public ResponseEntity<PaginatedResponse> getPromoCodePage(
-            @RequestParam(defaultValue = "0") @Min(value = 0)
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = ExceptionMessageConstants.VALIDATION_PAGE_NUMBER_MIN)
             int page,
-            @RequestParam(defaultValue = "15") @Min(value = 1)
+            @RequestParam(defaultValue = "15") @Min(value = 1, message = ExceptionMessageConstants.VALIDATION_PAGE_SIZE_MIN)
             int size,
             @RequestParam(defaultValue = "id")
             String sortField
@@ -55,15 +59,18 @@ public class PromoCodeController {
 
     @PostMapping
     public ResponseEntity<PromoCodeResponse> createPromoCode(
-            @RequestBody PromoCodeRequest promoCodeRequest
+            @RequestBody @Valid
+            PromoCodeRequest promoCodeRequest
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(promoCodeService.create(promoCodeRequest));
     }
 
     @PutMapping("{id}")
     public ResponseEntity<PromoCodeResponse> updatePromoCode(
-            @PathVariable String id,
-            @RequestBody PromoCodeRequest promoCodeRequest
+            @PathVariable
+            String id,
+            @RequestBody @Valid
+            PromoCodeRequest promoCodeRequest
     ) {
         return ResponseEntity.ok(promoCodeService.update(id, promoCodeRequest));
     }
