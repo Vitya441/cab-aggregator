@@ -1,0 +1,22 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: promocode-service
+
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/promocode_db
+
+#  datasource:
+#    url: ${DATASOURCE_URL:test}
+#    username: ${DATASOURCE_USERNAME:test}
+#    password: ${DATASOURCE_PASSWORD:test}
+#    driver-class-name: org.postgresql.Driver
+
+#  liquibase:
+#    enabled: true
+#    change-log: db/changelog/db.changelog-master.xml
+
