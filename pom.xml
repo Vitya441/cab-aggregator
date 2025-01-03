@@ -25,6 +25,7 @@
         <module>eureka-server</module>
         <module>rating-service</module>
         <module>price-service</module>
+        <module>promocode-service</module>
     </modules>
 
     <packaging>pom</packaging>
