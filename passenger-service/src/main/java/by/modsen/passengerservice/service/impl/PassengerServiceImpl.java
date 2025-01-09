@@ -1,6 +1,9 @@
 package by.modsen.passengerservice.service.impl;
 
+import by.modsen.passengerservice.client.PaymentClient;
+import by.modsen.passengerservice.dto.request.CustomerRequest;
 import by.modsen.passengerservice.dto.request.PassengerUpdateDto;
+import by.modsen.passengerservice.dto.response.CustomerResponse;
 import by.modsen.passengerservice.dto.response.PaginationDto;
 import by.modsen.passengerservice.dto.request.PassengerCreateDto;
 import by.modsen.passengerservice.dto.response.PassengerDto;
@@ -25,15 +28,23 @@ import java.util.List;
 public class PassengerServiceImpl implements PassengerService {
 
     private final PassengerRepository repository;
+    private final PaymentClient paymentClient;
     private final PassengerMapper mapper;
     private final PassengerValidator validator;
 
     @Override
     public PassengerDto create(PassengerCreateDto passengerCreateDto) {
         Passenger passenger = mapper.toPassenger(passengerCreateDto);
-        Passenger savedPassenger = repository.save(passenger);
+        CustomerRequest customerRequest = CustomerRequest.builder()
+                .name(passenger.getFirstName())
+                .balance(1000L)
+                .build();
 
-        return mapper.toPassengerDto(savedPassenger);
+        CustomerResponse customerResponse = paymentClient.createCustomer(customerRequest);
+        passenger.setCustomerId(customerResponse.customerId());
+        passenger = repository.save(passenger);
+
+        return mapper.toPassengerDto(passenger);
     }
 
     @Override
