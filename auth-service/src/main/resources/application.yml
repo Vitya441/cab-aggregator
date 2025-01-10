@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: keycloak-service
+    name: auth-service
 
   security:
     oauth2:
