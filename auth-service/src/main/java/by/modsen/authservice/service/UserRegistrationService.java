@@ -10,4 +10,8 @@ public interface UserRegistrationService {
     AccessTokenResponse getJwt(LoginRequest loginRequest);
 
     void registerUser(NewUserDto newUserDto, UserRole userRole);
+
+    void logout(String refreshToken);
+
+    AccessTokenResponse updateToken(String refreshToken);
 }

@@ -24,11 +24,9 @@ eureka:
 
 app:
   keycloak:
-    admin:
-      clientId: admin-cli
-      clientSecret: ${KEYCLOAK_SECRET:test}
-    user:
-      clientId: spring-security
+    adminClientId: admin-cli
+    adminClientSecret: ${KEYCLOAK_SECRET:test}
+    userClientId: spring-security
     realm: test-realm
     serverUrl: http://localhost:9090
 

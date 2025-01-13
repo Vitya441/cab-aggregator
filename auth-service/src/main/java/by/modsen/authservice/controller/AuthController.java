@@ -36,4 +36,16 @@ public class AuthController {
     public ResponseEntity<AccessTokenResponse> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(userRegistrationService.getJwt(loginRequest));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestParam String refreshToken) {
+        userRegistrationService.logout(refreshToken);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/update-token")
+    public ResponseEntity<AccessTokenResponse> updateToken(@RequestParam String refreshToken) {
+        AccessTokenResponse newAccessToken = userRegistrationService.updateToken(refreshToken);
+        return ResponseEntity.ok(newAccessToken);
+    }
 }
