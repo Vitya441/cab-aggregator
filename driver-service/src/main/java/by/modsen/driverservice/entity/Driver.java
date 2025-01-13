@@ -32,6 +32,9 @@ public class Driver {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "customer_id", nullable = false)
+    private String customerId;
+
     @OneToOne
     @JoinColumn(name = "car_id", referencedColumnName = "id", unique = true)
     private Car car;

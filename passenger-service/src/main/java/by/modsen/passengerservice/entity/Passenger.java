@@ -1,14 +1,11 @@
 package by.modsen.passengerservice.entity;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,11 +15,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "passenger")
@@ -35,6 +29,9 @@ public class Passenger {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "customer_id", nullable = false)
+    private String customerId;
+
     @Column(name = "firstname", nullable = false)
     private String firstName;
 
@@ -46,14 +43,6 @@ public class Passenger {
 
     @Column(name = "birthdate")
     private LocalDate birthDate;
-
-    @Column
-    private BigDecimal balance;
-
-    @ElementCollection
-    @CollectionTable(name = "passenger_ratings", joinColumns = @JoinColumn(name = "passenger_id"))
-    @Column(name = "rating")
-    private List<Integer> ratings =  new ArrayList<>();
 
     @CreatedDate
     @Column(name = "created_at")
