@@ -1,4 +1,4 @@
-package by.modsen.ridesservice.dto;
+package by.modsen.ridesservice.dto.response;
 
 import java.util.List;
 

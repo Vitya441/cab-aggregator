@@ -1,8 +1,8 @@
 package by.modsen.ridesservice.controller;
 
-import by.modsen.commonmodule.dto.RideRequest;
-import by.modsen.commonmodule.dto.RideResponse;
-import by.modsen.ridesservice.dto.PaginationDto;
+import by.modsen.ridesservice.dto.request.RideRequest;
+import by.modsen.ridesservice.dto.response.PaginationDto;
+import by.modsen.ridesservice.dto.response.RideResponse;
 import by.modsen.ridesservice.service.RideService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -85,5 +85,17 @@ public class RideController {
     public ResponseEntity<Void> endRide(@PathVariable Long rideId, @RequestParam Long driverId) {
         rideService.endRide(rideId, driverId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("{rideId}/rate-driver")
+    public ResponseEntity<Void> rateDriver(@PathVariable Long rideId, @RequestParam double rating) {
+        rideService.rateDriver(rideId, rating);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("{rideId}/rate-passenger")
+    public ResponseEntity<Void> ratePassenger(@PathVariable Long rideId, @RequestParam double rating) {
+        rideService.ratePassenger(rideId, rating);
+        return ResponseEntity.ok().build();
     }
 }

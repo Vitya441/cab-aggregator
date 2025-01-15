@@ -19,7 +19,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -51,13 +50,17 @@ public class Ride {
     @Enumerated(EnumType.STRING)
     private RideStatus status;
 
+    private boolean ratedByPassenger;
+
+    private boolean ratedByDriver;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
-    private Instant startTime;
+    private LocalDateTime startTime;
 
-    private Instant endTime;
+    private LocalDateTime endTime;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -70,11 +73,7 @@ public class Ride {
         this.status = RideStatus.REQUESTED;
     }
 
-    /**
-     * Длительность поездки в минутах
-     */
     public Long getDuration() {
         return Duration.between(startTime, endTime).toMinutes();
     }
-
 }

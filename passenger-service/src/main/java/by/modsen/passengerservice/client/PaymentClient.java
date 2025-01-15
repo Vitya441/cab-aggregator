@@ -11,5 +11,4 @@ public interface PaymentClient {
 
     @PostMapping("/api/v1/payments/customers")
     CustomerResponse createCustomer(@RequestBody CustomerRequest customerRequest);
-
 }

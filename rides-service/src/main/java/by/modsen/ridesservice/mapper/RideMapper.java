@@ -1,7 +1,7 @@
 package by.modsen.ridesservice.mapper;
 
-import by.modsen.commonmodule.dto.RideRequest;
-import by.modsen.commonmodule.dto.RideResponse;
+import by.modsen.ridesservice.dto.request.RideRequest;
+import by.modsen.ridesservice.dto.response.RideResponse;
 import by.modsen.ridesservice.entity.Ride;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;

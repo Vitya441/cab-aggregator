@@ -1,5 +1,7 @@
 package by.modsen.ridesservice.config;
 
+import by.modsen.commonmodule.dto.DriverNotificationEvent;
+import by.modsen.commonmodule.dto.DriverStatusEvent;
 import by.modsen.commonmodule.dto.RequestedRideEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -30,12 +32,32 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, RequestedRideEvent> producerFactory() {
+    public ProducerFactory<String, RequestedRideEvent> ridesProducerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
     @Bean
-    public KafkaTemplate<String, RequestedRideEvent> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+    public KafkaTemplate<String, RequestedRideEvent> ridesKafkaTemplate() {
+        return new KafkaTemplate<>(ridesProducerFactory());
+    }
+
+    @Bean
+    public ProducerFactory<String, DriverStatusEvent> driverStatusProducerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfig());
+    }
+
+    @Bean
+    public KafkaTemplate<String, DriverStatusEvent> driverStatusKafkaTemplate() {
+        return new KafkaTemplate<>(driverStatusProducerFactory());
+    }
+
+    @Bean
+    public ProducerFactory<String, DriverNotificationEvent> driverNotificationProducerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfig());
+    }
+
+    @Bean
+    public KafkaTemplate<String, DriverNotificationEvent> driverNotificationKafkaTemplate() {
+        return new KafkaTemplate<>(driverNotificationProducerFactory());
     }
 }
