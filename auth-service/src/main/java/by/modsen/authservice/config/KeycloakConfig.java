@@ -22,16 +22,4 @@ public class KeycloakConfig {
                 .serverUrl(keycloakProperties.getServerUrl())
                 .build();
     }
-
-//    public Keycloak userKeycloak(String username, String password) {
-//        return KeycloakBuilder.builder()
-//                .clientId(keycloakProperties.getUserClientId())
-//                .realm(keycloakProperties.getRealm())
-//                .serverUrl(keycloakProperties.getServerUrl())
-//                .grantType("password")
-//                .username(username)
-//                .password(password)
-//                .build();
-//    }
-
 }

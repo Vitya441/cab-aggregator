@@ -18,4 +18,6 @@ public interface UserService {
     List<RoleRepresentation> getUserRoles(String userId);
 
     List<GroupRepresentation> getUserGroups(String userId);
+
+    boolean isUserDataTaken(String email, String username);
 }

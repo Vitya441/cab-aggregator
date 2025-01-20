@@ -4,6 +4,7 @@ import by.modsen.authservice.dto.LoginRequest;
 import by.modsen.authservice.dto.NewUserDto;
 import by.modsen.authservice.dto.UserRole;
 import by.modsen.authservice.service.UserRegistrationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class AuthController {
             NewUserDto newUserDto,
             @RequestParam(name = "role")
             UserRole userRole
-    ) {
+    ) throws JsonProcessingException {
         userRegistrationService.registerUser(newUserDto, userRole);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -47,6 +47,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean isUserDataTaken(String email, String username) {
+        UsersResource usersResource = getUsersResource();
+
+        List<UserRepresentation> emailUsers = usersResource.searchByEmail(email, true);
+        if (!emailUsers.isEmpty()) {
+            log.error("User with email {} already exists", email);
+            return true;
+        }
+
+        List<UserRepresentation> usernameUsers = usersResource.search(username, true);
+        if (!usernameUsers.isEmpty()) {
+            log.error("User with username {} already exists", username);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public void deleteUser(String userId) {
         UsersResource usersResource = getUsersResource();
         usersResource.delete(userId);

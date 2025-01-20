@@ -11,6 +11,17 @@ spring:
         jwt:
           issuer-uri: ${app.keycloak.serverUrl}/realms/${app.keycloak.realm}
 
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
   kafka:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -40,5 +51,3 @@ app:
         name: driver-topic
         partitions: 1
         replicas: 1
-
-
