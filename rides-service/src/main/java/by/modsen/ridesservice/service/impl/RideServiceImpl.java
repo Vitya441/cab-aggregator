@@ -8,7 +8,10 @@ import by.modsen.commonmodule.enumeration.DriverStatus;
 import by.modsen.commonmodule.enumeration.RideStatus;
 import by.modsen.ridesservice.client.DriverClient;
 import by.modsen.ridesservice.client.PassengerClient;
+import by.modsen.ridesservice.client.PaymentClient;
+import by.modsen.ridesservice.client.PriceClient;
 import by.modsen.ridesservice.client.RatingClient;
+import by.modsen.ridesservice.dto.request.CustomerChargeRequest;
 import by.modsen.ridesservice.dto.request.RideRequest;
 import by.modsen.ridesservice.dto.response.PaginationDto;
 import by.modsen.ridesservice.dto.response.RideResponse;
@@ -30,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,6 +46,8 @@ public class RideServiceImpl implements RideService {
     private final RideMapper rideMapper;
     private final PassengerClient passengerClient;
     private final DriverClient driverClient;
+    private final PriceClient priceClient;
+    private final PaymentClient paymentClient;
     private final RatingClient ratingClient;
     private final RideValidator rideValidator;
     private final RequestedRidesProducer ridesProducer;
@@ -54,6 +60,8 @@ public class RideServiceImpl implements RideService {
             throw new ActiveRideExistsException(ExceptionMessageConstants.ACTIVE_RIDE_EXISTS);
         }
         Ride ride = rideMapper.toEntity(rideRequest);
+        BigDecimal cost = priceClient.calculatePriceForRide(rideRequest).divide(BigDecimal.valueOf(100));
+        ride.setEstimatedCost(cost);
         ride = rideRepository.save(ride);
 
         RequestedRideEvent rideEvent = RequestedRideEvent.builder()
@@ -62,6 +70,7 @@ public class RideServiceImpl implements RideService {
                 .build();
 
         ridesProducer.sendEvent(rideEvent);
+        
     }
 
     @Override
@@ -72,52 +81,15 @@ public class RideServiceImpl implements RideService {
         rideRepository.save(ride);
     }
 
+    //TODO: У водителя дожна быть машина которая должна возвращаться в DTO
     @Override
-    public RideResponse getCurrentRide(Long passengerId) {
+    public RideResponse getActiveRide(Long passengerId) {
         PassengerDto passengerDto = passengerClient.getPassengerById(passengerId);
         Ride ride = rideRepository
                 .findByPassengerIdAndStatusIn(passengerDto.id(), RideStatusConstants.ACTIVE_STATUSES)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessageConstants.NO_ACTIVE_RIDE_FOUND));
 
         return rideMapper.toDto(ride);
-    }
-
-    @Override
-    public PaginationDto<RideResponse> getHistoryByPassengerId(Long passengerId, int page, int size, String sortField) {
-        PassengerDto passengerDto = passengerClient.getPassengerById(passengerId);
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
-
-        Page<Ride> ridesPage = rideRepository.findAllByPassengerIdAndStatus(passengerDto.id(), RideStatus.COMPLETED, pageRequest);
-        List<RideResponse> data = ridesPage.getContent().stream()
-                .map(rideMapper::toDto)
-                .toList();
-
-        return new PaginationDto<>(
-                data,
-                ridesPage.getNumber(),
-                ridesPage.getSize(),
-                ridesPage.getTotalElements(),
-                ridesPage.getTotalPages()
-        );
-    }
-
-    @Override
-    public PaginationDto<RideResponse> getHistoryByDriverId(Long driverId, int page, int size, String sortField) {
-        DriverDto driverDto =driverClient.getDriverById(driverId);
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
-
-        Page<Ride> ridesPage = rideRepository.findAllByDriverIdAndStatus(driverDto.id(), RideStatus.COMPLETED, pageRequest);
-        List<RideResponse> data = ridesPage.getContent().stream()
-                .map(rideMapper::toDto)
-                .toList();
-
-        return new PaginationDto<>(
-                data,
-                ridesPage.getNumber(),
-                ridesPage.getSize(),
-                ridesPage.getTotalElements(),
-                ridesPage.getTotalPages()
-        );
     }
 
     @Override
@@ -163,9 +135,18 @@ public class RideServiceImpl implements RideService {
     public void endRide(Long rideId, Long driverId) {
         Ride ride = getRideByIdOrThrow(rideId);
         rideValidator.validateEnding(ride, driverId);
+
+        PassengerDto passenger = passengerClient.getPassengerById(ride.getPassengerId());
+        Long amount = ride.getEstimatedCost().longValue();
+        CustomerChargeRequest chargeRequest = CustomerChargeRequest.builder()
+                .customerId(passenger.customerId())
+                .currency("USD")
+                .amount(amount)
+                .build();
+
+        paymentClient.chargeFromCustomer(chargeRequest);
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
-        Long duration = 5L;
         rideRepository.save(ride);
 
         DriverStatusEvent statusEvent = DriverStatusEvent.builder()
@@ -174,6 +155,44 @@ public class RideServiceImpl implements RideService {
                 .build();
 
         driverStatusProducer.sendEvent(statusEvent);
+    }
+
+    @Override
+    public PaginationDto<RideResponse> getHistoryByPassengerId(Long passengerId, int page, int size, String sortField) {
+        PassengerDto passengerDto = passengerClient.getPassengerById(passengerId);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
+
+        Page<Ride> ridesPage = rideRepository.findAllByPassengerIdAndStatus(passengerDto.id(), RideStatus.COMPLETED, pageRequest);
+        List<RideResponse> data = ridesPage.getContent().stream()
+                .map(rideMapper::toDto)
+                .toList();
+
+        return new PaginationDto<>(
+                data,
+                ridesPage.getNumber(),
+                ridesPage.getSize(),
+                ridesPage.getTotalElements(),
+                ridesPage.getTotalPages()
+        );
+    }
+
+    @Override
+    public PaginationDto<RideResponse> getHistoryByDriverId(Long driverId, int page, int size, String sortField) {
+        DriverDto driverDto =driverClient.getDriverById(driverId);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
+
+        Page<Ride> ridesPage = rideRepository.findAllByDriverIdAndStatus(driverDto.id(), RideStatus.COMPLETED, pageRequest);
+        List<RideResponse> data = ridesPage.getContent().stream()
+                .map(rideMapper::toDto)
+                .toList();
+
+        return new PaginationDto<>(
+                data,
+                ridesPage.getNumber(),
+                ridesPage.getSize(),
+                ridesPage.getTotalElements(),
+                ridesPage.getTotalPages()
+        );
     }
 
     @Override

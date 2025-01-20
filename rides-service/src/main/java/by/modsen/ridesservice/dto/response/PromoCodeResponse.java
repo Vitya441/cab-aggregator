@@ -1,4 +1,4 @@
-package by.modsen.promocodeservice.dto;
+package by.modsen.ridesservice.dto.response;
 
 public record PromoCodeResponse(
         String id,

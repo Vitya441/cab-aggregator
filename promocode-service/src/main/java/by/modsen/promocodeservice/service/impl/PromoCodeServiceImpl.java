@@ -34,13 +34,20 @@ public class PromoCodeServiceImpl implements PromoCodeService {
     }
 
     @Override
-    public PromoCodeResponse getByCode(String code) {
-        PromoCode promoCode = repository
-                .findByCode(code)
-                .orElseThrow(() -> new PromoCodeNotFoundException(
-                        ExceptionMessageConstants.PROMOCODE_WITH_CODE_NOT_FOUND, code
-                ));
+    public PromoCodeResponse applyPromoCode(String code) {
+        PromoCode promoCode = getPromoCodeByCodeOrThrow(code);
+        if (promoCode.getCount() <= 0) {
+            throw new RuntimeException("Promo code is no longer available");
+        }
+        promoCode.setCount(promoCode.getCount() - 1);
+        promoCode = repository.save(promoCode);
 
+        return mapper.toDto(promoCode);
+    }
+
+    @Override
+    public PromoCodeResponse getByCode(String code) {
+        PromoCode promoCode = getPromoCodeByCodeOrThrow(code);
         return mapper.toDto(promoCode);
     }
 
@@ -99,6 +106,14 @@ public class PromoCodeServiceImpl implements PromoCodeService {
                 .findById(id)
                 .orElseThrow(() -> new PromoCodeNotFoundException(
                         ExceptionMessageConstants.PROMOCODE_WITH_ID_NOT_FOUND, id
+                ));
+    }
+
+    private PromoCode getPromoCodeByCodeOrThrow(String code) {
+        return repository
+                .findByCode(code)
+                .orElseThrow(() -> new PromoCodeNotFoundException(
+                        ExceptionMessageConstants.PROMOCODE_WITH_CODE_NOT_FOUND, code
                 ));
     }
 
