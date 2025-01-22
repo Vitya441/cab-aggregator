@@ -1,4 +1,4 @@
-package by.modsen.commonmodule.dto;
+package by.modsen.ridesservice.dto.request;
 
 import by.modsen.commonmodule.enumeration.CarCategory;
 import by.modsen.commonmodule.enumeration.PaymentMethod;

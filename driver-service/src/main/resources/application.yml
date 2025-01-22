@@ -38,11 +38,10 @@ app:
     producer:
       topic: available-drivers-topic
 
-## Мозолит глаза когда не включена Kafka
-#logging:
-#  level:
-#    org.apache.kafka.clients.NetworkClient: ERROR
-#    org.apache.kafka.clients: ERROR
+    driver-status-consumer:
+      topic: driver-status-topic
+      group-id: driver-group
+
 
 eureka:
   client:

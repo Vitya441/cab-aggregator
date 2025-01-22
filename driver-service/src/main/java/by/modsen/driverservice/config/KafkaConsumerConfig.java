@@ -1,5 +1,6 @@
 package by.modsen.driverservice.config;
 
+import by.modsen.commonmodule.dto.DriverStatusEvent;
 import by.modsen.commonmodule.dto.RequestedRideEvent;
 import by.modsen.driverservice.kafka.NewUserDto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -71,6 +72,27 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, RequestedRideEvent> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(ridesConsumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, DriverStatusEvent> driverStatusConsumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, ridesGroupId);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+
+        return new DefaultKafkaConsumerFactory<>(props,
+                new StringDeserializer(),
+                new JsonDeserializer<>(DriverStatusEvent.class));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, DriverStatusEvent>
+    driverStatusKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, DriverStatusEvent> factory
+                = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(driverStatusConsumerFactory());
         return factory;
     }
 }
