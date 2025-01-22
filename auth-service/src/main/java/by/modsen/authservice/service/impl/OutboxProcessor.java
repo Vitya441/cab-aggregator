@@ -20,7 +20,7 @@ public class OutboxProcessor {
     private final OutboxRepository outboxRepository;
     private final KafkaTemplate<String, NewUserDto> kafkaTemplate;
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(cron = "${app.scheduler.cron-every-5-seconds}")
     public void processOutboxMessages() {
         List<OutboxMessage> messages = outboxRepository.findBySentFalse();
 

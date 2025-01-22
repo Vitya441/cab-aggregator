@@ -40,6 +40,9 @@ app:
     userClientId: spring-security
     realm: test-realm
     serverUrl: http://localhost:9090
+  scheduler:
+    cron-every-5-seconds: "0/5 * * * * *"
+
 
   kafka:
     topics:

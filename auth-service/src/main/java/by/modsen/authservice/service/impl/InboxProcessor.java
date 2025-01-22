@@ -31,7 +31,7 @@ public class InboxProcessor {
     private final RoleService roleService;
     private final KafkaTopicsProperties kafkaTopicsProperties;
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(cron = "${app.scheduler.cron-every-5-seconds}")
     @Transactional
     public void processInboxMessages() {
         List<InboxMessage> messages = inboxRepository.findByStatusNot(InboxStatus.PROCESSED);

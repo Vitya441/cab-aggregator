@@ -30,7 +30,7 @@ public class InboxMessage {
 
     private String payload;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     private InboxStatus status = InboxStatus.PENDING;
 
