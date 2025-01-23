@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum InboxStatus {
-    PENDING(0),
     PROCESSED(1),
-    FAILED(2);
+    FAILED(2),
+    PENDING(0);
 
-    private final int code;
+    private final Integer code;
 }

@@ -1,9 +1,9 @@
 package by.modsen.authservice.entity;
 
+import by.modsen.authservice.util.InboxStatusConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,8 +30,7 @@ public class InboxMessage {
 
     private String payload;
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(nullable = false)
+    @Convert(converter = InboxStatusConverter.class)
     private InboxStatus status = InboxStatus.PENDING;
 
     @Column(nullable = false)
