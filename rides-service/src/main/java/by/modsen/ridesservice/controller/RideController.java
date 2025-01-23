@@ -32,7 +32,7 @@ public class RideController {
 
     @GetMapping("/current")
     public ResponseEntity<RideResponse> getCurrentRide(@RequestParam Long passengerId) {
-        return ResponseEntity.ok(rideService.getCurrentRide(passengerId));
+        return ResponseEntity.ok(rideService.getActiveRide(passengerId));
     }
 
     @GetMapping("/passenger/history/{passengerId}")

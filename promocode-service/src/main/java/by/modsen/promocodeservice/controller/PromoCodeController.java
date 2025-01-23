@@ -35,6 +35,12 @@ public class PromoCodeController {
         return ResponseEntity.ok(promoCodeService.getById(id));
     }
 
+    @PutMapping("/apply/{code}")
+    public ResponseEntity<PromoCodeResponse> applyPromoCode(@PathVariable String code) {
+        PromoCodeResponse promoCodeResponse = promoCodeService.applyPromoCode(code);
+        return ResponseEntity.ok(promoCodeResponse);
+    }
+
     @GetMapping("/code/{code}")
     public ResponseEntity<PromoCodeResponse> getPromoCodeByCode(@PathVariable String code) {
         return ResponseEntity.ok(promoCodeService.getByCode(code));

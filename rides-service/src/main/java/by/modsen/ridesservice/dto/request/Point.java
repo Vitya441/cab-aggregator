@@ -1,4 +1,4 @@
-package by.modsen.priceservice.dto.request;
+package by.modsen.ridesservice.dto.request;
 
 public record Point(
         Double x,

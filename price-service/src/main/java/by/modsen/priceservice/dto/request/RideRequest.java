@@ -8,5 +8,6 @@ public record RideRequest(
         Point pickupAddress,
         Point destinationAddress,
         CarCategory carCategory,
-        PaymentMethod paymentMethod
+        PaymentMethod paymentMethod,
+        String promocode
 ) {}

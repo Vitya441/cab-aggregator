@@ -21,4 +21,5 @@ public interface PromoCodeService {
 
     void deleteById(String id);
 
+    PromoCodeResponse applyPromoCode(String code);
 }

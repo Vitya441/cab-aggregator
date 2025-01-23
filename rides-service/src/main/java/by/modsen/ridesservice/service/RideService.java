@@ -10,7 +10,7 @@ public interface RideService {
 
     void assignDriverToRide(Long driverId, Long rideId);
 
-    RideResponse getCurrentRide(Long passengerId);
+    RideResponse getActiveRide(Long passengerId);
 
     PaginationDto<RideResponse> getHistoryByPassengerId(Long passengerId, int page, int size, String sortField);
 

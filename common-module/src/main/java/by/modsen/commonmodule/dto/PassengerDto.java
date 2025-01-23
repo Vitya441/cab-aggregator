@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 public record PassengerDto(
         long id,
+        String customerId,
         String firstName,
         String lastName,
         String phone,
