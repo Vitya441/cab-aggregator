@@ -12,11 +12,6 @@ public class InboxStatusConverter implements AttributeConverter<InboxStatus, Int
 
     @Override
     public InboxStatus convertToEntityAttribute(Integer dbData) {
-        for (InboxStatus inboxStatus : InboxStatus.values()) {
-            if (inboxStatus.getCode().equals(dbData)) {
-                return inboxStatus;
-            }
-        }
-        throw new IllegalArgumentException("Неизвестный ID:" + dbData);
+        return InboxStatus.fromCode(dbData);
     }
 }
