@@ -31,12 +31,19 @@ app:
     consumer:
       topic: driver-topic
       group-id: driver-group
-      type-mappings: "by.modsen.keycloakservice.dto.NewUserDto:by.modsen.driverservice.kafka.NewUserDto"
+      type-mappings: "by.modsen.authservice.dto.NewUserDto:by.modsen.driverservice.kafka.NewUserDto"
     consumer-2:
       topic: requested-rides-topic
       group-id: driver-group
     producer:
       topic: available-drivers-topic
+
+
+## Мозолит глаза когда не включена Kafka
+#logging:
+#  level:
+#    org.apache.kafka.clients.NetworkClient: ERROR
+#    org.apache.kafka.clients: ERROR
 
     driver-status-consumer:
       topic: driver-status-topic

@@ -3,13 +3,23 @@ server:
 
 spring:
   application:
-    name: keycloak-service
+    name: auth-service
 
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${app.keycloak.serverUrl}/realms/${app.keycloak.realm}
+
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 
 
   kafka:
@@ -18,15 +28,21 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     bootstrap-servers: localhost:29092
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
 app:
   keycloak:
-    admin:
-      clientId: admin-cli
-      clientSecret: ${KEYCLOAK_SECRET:test}
-    user:
-      clientId: spring-security
+    adminClientId: admin-cli
+    adminClientSecret: ${KEYCLOAK_SECRET:test}
+    userClientId: spring-security
     realm: test-realm
     serverUrl: http://localhost:9090
+  scheduler:
+    cron-every-5-seconds: "0/5 * * * * *"
+
 
   kafka:
     topics:
@@ -38,5 +54,3 @@ app:
         name: driver-topic
         partitions: 1
         replicas: 1
-
-
