@@ -13,8 +13,6 @@ import java.util.List;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PassengerMapper {
 
-    Passenger toPassenger(PassengerDto passengerDto);
-
     Passenger toPassenger(PassengerCreateDto passengerCreateDto);
 
     PassengerDto toPassengerDto(Passenger passenger);

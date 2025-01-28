@@ -31,6 +31,13 @@ app:
       group-id: passenger-group
       type-mappings: "by.modsen.keycloakservice.dto.NewUserDto:by.modsen.passengerservice.kafka.NewUserDto"
 
+  feign-clients:
+    rating-service:
+      url: rating-service
+    payment-service:
+      url: payment-service
+
+
 ## Мозолит глаза когда не включена Kafka
 #logging:
 #  level:
@@ -41,3 +48,4 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
