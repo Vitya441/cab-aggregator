@@ -1,12 +1,13 @@
-package by.modsen.commonmodule.dto;
+package by.modsen.ridesservice.dto.request;
 
 import by.modsen.commonmodule.enumeration.CarCategory;
 import by.modsen.commonmodule.enumeration.PaymentMethod;
 
 public record RideRequest(
         Long passengerId,
-        String pickupAddress,
-        String destinationAddress,
+        Point pickupAddress,
+        Point destinationAddress,
         CarCategory carCategory,
-        PaymentMethod paymentMethod
+        PaymentMethod paymentMethod,
+        String promocode
 ) {}

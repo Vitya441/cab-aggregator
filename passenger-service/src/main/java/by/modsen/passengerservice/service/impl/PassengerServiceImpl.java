@@ -1,6 +1,10 @@
 package by.modsen.passengerservice.service.impl;
 
+import by.modsen.passengerservice.client.PaymentClient;
+import by.modsen.passengerservice.client.RatingClient;
+import by.modsen.passengerservice.dto.request.CustomerRequest;
 import by.modsen.passengerservice.dto.request.PassengerUpdateDto;
+import by.modsen.passengerservice.dto.response.CustomerResponse;
 import by.modsen.passengerservice.dto.response.PaginationDto;
 import by.modsen.passengerservice.dto.request.PassengerCreateDto;
 import by.modsen.passengerservice.dto.response.PassengerDto;
@@ -25,25 +29,35 @@ import java.util.List;
 public class PassengerServiceImpl implements PassengerService {
 
     private final PassengerRepository repository;
-    private final PassengerMapper mapper;
+    private final PaymentClient paymentClient;
+    private final RatingClient ratingClient;
+    private final PassengerMapper passengerMapper;
     private final PassengerValidator validator;
 
     @Override
     public PassengerDto create(PassengerCreateDto passengerCreateDto) {
-        Passenger passenger = mapper.toPassenger(passengerCreateDto);
-        Passenger savedPassenger = repository.save(passenger);
+        Passenger passenger = passengerMapper.toPassenger(passengerCreateDto);
+        CustomerRequest customerRequest = CustomerRequest.builder()
+                .name(passenger.getFirstName())
+                .balance(1000L)
+                .build();
 
-        return mapper.toPassengerDto(savedPassenger);
+        CustomerResponse customerResponse = paymentClient.createCustomer(customerRequest);
+        passenger.setCustomerId(customerResponse.customerId());
+        passenger = repository.save(passenger);
+        ratingClient.createPassengerRatingRecord(passenger.getId());
+
+        return passengerMapper.toPassengerDto(passenger);
     }
 
     @Override
     public PassengerDto update(long id, PassengerUpdateDto passengerUpdateDto) {
         Passenger currentPassenger = getPassengerByIdOrThrow(id);
         validator.validateUniqueness(passengerUpdateDto, currentPassenger);
-        mapper.updatePassengerFromDto(passengerUpdateDto, currentPassenger);
+        passengerMapper.updatePassengerFromDto(passengerUpdateDto, currentPassenger);
         Passenger savedPassenger = repository.save(currentPassenger);
 
-        return mapper.toPassengerDto(savedPassenger);
+        return passengerMapper.toPassengerDto(savedPassenger);
     }
 
     @Override
@@ -51,7 +65,7 @@ public class PassengerServiceImpl implements PassengerService {
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         Page<Passenger> page = repository.findAll(pageRequest);
         List<PassengerDto> data = page.getContent().stream()
-                .map(mapper::toPassengerDto)
+                .map(passengerMapper::toPassengerDto)
                 .toList();
 
         return new PaginationDto<>(
@@ -67,7 +81,7 @@ public class PassengerServiceImpl implements PassengerService {
     public PassengerDto getById(long id) {
         Passenger passenger = getPassengerByIdOrThrow(id);
 
-        return mapper.toPassengerDto(passenger);
+        return passengerMapper.toPassengerDto(passenger);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package by.modsen.ridesservice.service;
 
-import by.modsen.commonmodule.dto.RideRequest;
-import by.modsen.commonmodule.dto.RideResponse;
-import by.modsen.ridesservice.dto.PaginationDto;
+import by.modsen.ridesservice.dto.request.RideRequest;
+import by.modsen.ridesservice.dto.response.PaginationDto;
+import by.modsen.ridesservice.dto.response.RideResponse;
 
 public interface RideService {
 
@@ -10,7 +10,7 @@ public interface RideService {
 
     void assignDriverToRide(Long driverId, Long rideId);
 
-    RideResponse getCurrentRide(Long passengerId);
+    RideResponse getActiveRide(Long passengerId);
 
     PaginationDto<RideResponse> getHistoryByPassengerId(Long passengerId, int page, int size, String sortField);
 
@@ -23,4 +23,8 @@ public interface RideService {
     void startRide(Long rideId, Long driverId);
 
     void endRide(Long rideId, Long driverId);
+
+    void rateDriver(Long rideId, double rating);
+
+    void ratePassenger(Long rideId, double rating);
 }

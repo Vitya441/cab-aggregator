@@ -30,6 +30,13 @@ app:
     consumer:
       topic: available-drivers-topic
       group-id: rides-group
+    driver-status-producer:
+      topic: driver-status-topic
+      group-id: rides-group
+    driver-notifications-producer:
+      topic: driver-notifications-topic
+
+
 
 eureka:
   client:

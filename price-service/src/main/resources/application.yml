@@ -1,11 +1,14 @@
+server:
+  port: 8087
+
 spring:
   application:
     name: price-service
 
   datasource:
-    url: ${DATASOURCE_URL:test}
-    username: ${DATASOURCE_USERNAME:test}
-    password: ${DATASOURCE_PASSWORD:test}
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
 
   jpa:
     hibernate:
@@ -17,3 +20,8 @@ spring:
     enabled: true
     change-log: db/changelog/db.changelog-master.xml
 
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

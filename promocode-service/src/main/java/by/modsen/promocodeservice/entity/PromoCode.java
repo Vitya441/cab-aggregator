@@ -18,6 +18,5 @@ public class PromoCode {
 
     private Long count;
 
-    private Double percent;
-
+    private Integer percent;
 }

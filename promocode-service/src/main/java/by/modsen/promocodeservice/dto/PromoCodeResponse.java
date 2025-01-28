@@ -5,5 +5,5 @@ public record PromoCodeResponse(
         String name,
         String code,
         Long count,
-        Double percent
+        Integer percent
 ) {}

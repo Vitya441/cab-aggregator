@@ -1,10 +1,10 @@
-package by.modsen.commonmodule.dto;
+package by.modsen.ridesservice.dto.response;
 
 import by.modsen.commonmodule.enumeration.PaymentMethod;
 import by.modsen.commonmodule.enumeration.RideStatus;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public record RideResponse(
         Long id,
@@ -16,6 +16,6 @@ public record RideResponse(
         BigDecimal actualCost,
         RideStatus status,
         PaymentMethod paymentMethod,
-        Instant startTime,
-        Instant endTime
+        LocalDateTime startTime,
+        LocalDateTime endTime
 ) {}

@@ -1,7 +1,11 @@
 package by.modsen.driverservice.service.impl;
 
+import by.modsen.driverservice.client.PaymentClient;
+import by.modsen.driverservice.client.RatingClient;
+import by.modsen.driverservice.dto.request.CustomerRequest;
 import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.request.DriverUpdateDto;
+import by.modsen.driverservice.dto.response.CustomerResponse;
 import by.modsen.driverservice.dto.response.DriverDto;
 import by.modsen.driverservice.dto.response.DriverWithCarDto;
 import by.modsen.driverservice.dto.response.PaginationDto;
@@ -29,6 +33,8 @@ import java.util.List;
 public class DriverServiceImpl implements DriverService {
 
     private final DriverRepository driverRepository;
+    private final PaymentClient paymentClient;
+    private final RatingClient ratingClient;
     private final CarRepository carRepository;
     private final DriverMapper driverMapper;
 
@@ -84,9 +90,17 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public DriverDto create(DriverCreateDto driverCreateDto) {
         Driver driver = driverMapper.toEntity(driverCreateDto);
-        Driver savedDriver = driverRepository.save(driver);
+        CustomerRequest customerRequest = CustomerRequest.builder()
+                .name(driver.getFirstName())
+                .balance(1000L)
+                .build();
 
-        return driverMapper.toDto(savedDriver);
+        CustomerResponse customerResponse = paymentClient.createCustomer(customerRequest);
+        driver.setCustomerId(customerResponse.customerId());
+        driver = driverRepository.save(driver);
+        ratingClient.createDriverRatingRecord(driver.getId());
+
+        return driverMapper.toDto(driver);
     }
 
     @Transactional

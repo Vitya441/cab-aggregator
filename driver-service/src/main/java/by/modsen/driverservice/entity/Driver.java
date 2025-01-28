@@ -1,6 +1,6 @@
 package by.modsen.driverservice.entity;
 
-import by.modsen.driverservice.entity.enums.DriverStatus;
+import by.modsen.commonmodule.enumeration.DriverStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -32,6 +32,9 @@ public class Driver {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "customer_id", nullable = false)
+    private String customerId;
+
     @OneToOne
     @JoinColumn(name = "car_id", referencedColumnName = "id", unique = true)
     private Car car;
@@ -48,6 +51,9 @@ public class Driver {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private DriverStatus status;
+
+    @Column(name = "rejected_ride_id")
+    private Long rejectedRideId;
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp

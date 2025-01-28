@@ -25,5 +25,4 @@ public interface DriverService {
     void assignCarToDriver(long id, long carId);
 
     void unAssignCarFromDriver(long id);
-
 }

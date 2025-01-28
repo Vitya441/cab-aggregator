@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RidesConsumer {
 
-    private final AvailableDriverProducer producer;
+    private final AvailableDriverProducer availableDriverProducer;
     private final AvailableDriverService availableDriverService;
 
     @KafkaListener(
@@ -25,13 +25,13 @@ public class RidesConsumer {
     )
     public void listenRideRequest(RequestedRideEvent rideEvent) {
         log.info("Consumed -> {}", rideEvent.pickupAddress());
-        DriverDto driverDto = availableDriverService.getAvailableDriver(rideEvent.pickupAddress());
+        DriverDto driverDto = availableDriverService.getAvailableDriver(rideEvent.rideId());
 
         AvailableDriverEvent availableDriverEvent = AvailableDriverEvent.builder()
                 .driverId(driverDto.id())
                 .rideId(rideEvent.rideId())
                 .build();
 
-        producer.send(availableDriverEvent);
+        availableDriverProducer.send(availableDriverEvent);
     }
 }

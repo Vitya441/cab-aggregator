@@ -1,8 +1,7 @@
 package by.modsen.promocodeservice.dto;
 
 import by.modsen.promocodeservice.util.ExceptionMessageConstants;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,8 +23,7 @@ public record PromoCodeRequest(
         Long count,
 
         @NotNull(message = ExceptionMessageConstants.VALIDATION_PROMOCODE_PERCENT_MIN)
-        @DecimalMin(value = "0.0", inclusive = false, message = ExceptionMessageConstants.VALIDATION_PROMOCODE_PERCENT_MIN)
-        @DecimalMax(value = "100.0", inclusive = true, message = ExceptionMessageConstants.VALIDATION_PROMOCODE_PERCENT_MAX)
-        Double percent
-
+        @Min(value = 0, message = ExceptionMessageConstants.VALIDATION_PROMOCODE_PERCENT_MIN)
+        @Max(value = 100, message = ExceptionMessageConstants.VALIDATION_PROMOCODE_PERCENT_MAX)
+        Integer percent
 ) {}
