@@ -3,50 +3,40 @@ package by.modsen.passengerservice.integration;
 import by.modsen.passengerservice.config.DatabaseContainerConfig;
 import by.modsen.passengerservice.dto.request.PassengerCreateDto;
 import by.modsen.passengerservice.dto.request.PassengerUpdateDto;
-import by.modsen.passengerservice.entity.Passenger;
 import by.modsen.passengerservice.repository.PassengerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Optional;
-
 import static by.modsen.passengerservice.util.PassengerTestConstants.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @Testcontainers
-@AutoConfigureMockMvc
 @Sql(scripts = {
         "classpath:sql/delete-passengers.sql",
         "classpath:sql/insert-passengers.sql"
 }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class PassengerIntegrationTest extends DatabaseContainerConfig {
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @LocalServerPort
     private int port;
@@ -65,50 +55,60 @@ class PassengerIntegrationTest extends DatabaseContainerConfig {
         registry.add("app.feign-clients.payment-service.url", wireMockServer::baseUrl);
     }
 
-    private final String BASE_URL =  "http://localhost:" + port + PASSENGER_PATH;
+    private String BASE_URL;
 
-    @Test
-    void getAllPassengers() throws Exception {
-
-        System.out.println("SERVER PORT = " + port);
-
-        mockMvc.perform(get(BASE_URL))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(8))
-                .andReturn();
+    @BeforeEach
+    void setup() {
+        BASE_URL = "http://localhost:" + port + PASSENGER_PATH;
     }
 
     @Test
-    void getPassengerById_shouldReturnFirstPassenger() throws Exception {
-        mockMvc.perform(get(BASE_URL + "/" + PASSENGER_ID))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.firstName").value("John"))
-                .andExpect(jsonPath("$.lastName").value("Doe"));
+    void getAllPassengers() {
+        RestAssured.given()
+                .when()
+                .get(BASE_URL)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("data", hasSize(8));
+    }
+
+    @Test
+    void getPassengerById_shouldReturnFirstPassenger() {
+        RestAssured.given()
+                .when()
+                .get(BASE_URL + "/" + PASSENGER_ID)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(1))
+                .body("firstName", equalTo("John"))
+                .body("lastName", equalTo("Doe"));
     }
 
     @Test
     void deletePassengerById_shouldReturnNoContent() throws Exception {
-        mockMvc.perform(delete(BASE_URL + "/" + PASSENGER_ID))
-                .andExpect(status().isNoContent());
+        RestAssured.given()
+                .when()
+                .delete(BASE_URL + "/" + PASSENGER_ID)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
 
-        Optional<Passenger> passenger = repository.findById(PASSENGER_ID);
-        assertFalse(passenger.isPresent());
-        assertFalse(repository.existsById(PASSENGER_ID));
+        Assertions.assertFalse(repository.existsById(PASSENGER_ID));
     }
 
     @Test
     void updatePassengerById_shouldReturnUpdatedPassenger() throws Exception {
         PassengerUpdateDto updateDto = getPassengerUpdateDto();
-        String jsonPassenger = asJsonString(updateDto);
-        mockMvc.perform(put(BASE_URL + "/" + PASSENGER_ID)
-                        .content(jsonPassenger)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(PASSENGER_ID))
-                .andExpect(jsonPath("$.firstName").value("John"))
-                .andExpect(jsonPath("$.phone").value(PHONE));
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(updateDto)
+                .when()
+                .put(BASE_URL + "/" + PASSENGER_ID)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(1))
+                .body("firstName", equalTo("John"))
+                .body("phone", equalTo(PHONE));
     }
 
     @Test
@@ -136,15 +136,15 @@ class PassengerIntegrationTest extends DatabaseContainerConfig {
 
         PassengerCreateDto createDto = getPassengerCreateDto();
 
-        MvcResult result = mockMvc.perform(post(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(createDto)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.firstName").value("Viktor"))
-                .andExpect(jsonPath("$.lastName").value("Maksimov"))
-                .andReturn();
-
-        System.out.println(result.getResponse().getContentAsString());
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(createDto)
+                .when()
+                .post(BASE_URL)
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .body("firstName", equalTo(FIRST_NAME))
+                .body("lastName", equalTo(LAST_NAME));
     }
 
     private static String asJsonString(final Object obj) {
