@@ -11,13 +11,16 @@ import by.modsen.passengerservice.dto.response.PassengerDto;
 import by.modsen.passengerservice.entity.Passenger;
 import by.modsen.passengerservice.exception.PassengerNotFoundException;
 import by.modsen.passengerservice.mapper.PassengerMapper;
+import by.modsen.passengerservice.mapper.PassengerMapperImpl;
 import by.modsen.passengerservice.repository.PassengerRepository;
 import by.modsen.passengerservice.service.impl.PassengerServiceImpl;
+import by.modsen.passengerservice.utils.MessageUtils;
 import by.modsen.passengerservice.utils.PassengerValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,8 +50,8 @@ class PassengerServiceImplTest {
     @Mock
     private RatingClient ratingClient;
 
-    @Mock
-    private PassengerMapper passengerMapper;
+    @Spy
+    private PassengerMapper passengerMapper = new PassengerMapperImpl();
 
     @Mock
     private PassengerValidator passengerValidator;
@@ -61,19 +64,20 @@ class PassengerServiceImplTest {
         CustomerRequest customerRequest = getCustomerRequest();
         CustomerResponse customerResponse = getCustomerResponse();
 
-        when(passengerMapper.toPassenger(passengerCreateDto)).thenReturn(passenger);
-        when(paymentClient.createCustomer(customerRequest)).thenReturn(customerResponse);
-        when(passengerRepository.save(passenger)).thenReturn(passenger);
-        when(passengerMapper.toPassengerDto(passenger)).thenReturn(passengerDto);
+        when(paymentClient.createCustomer(customerRequest))
+                .thenReturn(customerResponse);
+        doReturn(passenger)
+                .when(passengerRepository).save(any(Passenger.class));
+        doNothing().when(ratingClient).
+                createPassengerRatingRecord(passenger.getId());
 
         PassengerDto responseDto = passengerService.create(passengerCreateDto);
 
         assertEquals(passengerDto.firstName(), responseDto.firstName());
         assertEquals(passengerDto.lastName(), responseDto.lastName());
-
         verify(ratingClient).createPassengerRatingRecord(passenger.getId());
-        verify(passengerMapper, times(1)).toPassenger(passengerCreateDto);
-        verify(passengerRepository, times(1)).save(passenger);
+        verify(passengerRepository).save(any(Passenger.class));
+        verify(ratingClient).createPassengerRatingRecord(passenger.getId());
     }
 
     @Test
@@ -83,9 +87,10 @@ class PassengerServiceImplTest {
         Passenger updatedPassenger = getUpdatedPassenger();
         PassengerDto updatedDto = getUpdatedPassengerDto();
 
-        when(passengerRepository.findById(PASSENGER_ID)).thenReturn(Optional.of(currentPassenger));
-        when(passengerRepository.save(any(Passenger.class))).thenReturn(updatedPassenger);
-        when(passengerMapper.toPassengerDto(updatedPassenger)).thenReturn(updatedDto);
+        when(passengerRepository.findById(PASSENGER_ID))
+                .thenReturn(Optional.of(currentPassenger));
+        when(passengerRepository.save(currentPassenger))
+                .thenReturn(updatedPassenger);
 
         PassengerDto updatedResponse = passengerService.update(PASSENGER_ID, updateDto);
 
@@ -93,6 +98,8 @@ class PassengerServiceImplTest {
         assertEquals(updatedDto.firstName(), updatedResponse.firstName());
         assertEquals(updatedDto.lastName(), updatedResponse.lastName());
         assertEquals(updatedDto.phone(), updatedResponse.phone());
+        verify(passengerRepository).findById(PASSENGER_ID);
+        verify(passengerRepository).save(currentPassenger);
     }
 
     @Test
@@ -100,34 +107,37 @@ class PassengerServiceImplTest {
         Long invalidId = 999L;
         PassengerUpdateDto passengerUpdateDto = getPassengerUpdateDto();
 
-        when(passengerRepository.findById(invalidId)).thenReturn(Optional.empty());
+        when(passengerRepository.findById(invalidId))
+                .thenReturn(Optional.empty());
 
         assertThrows(PassengerNotFoundException.class, () -> passengerService.update(invalidId, passengerUpdateDto));
-        verify(passengerRepository, times(1)).findById(invalidId);
-        verifyNoMoreInteractions(passengerRepository);
+        verify(passengerRepository).findById(invalidId);
     }
 
     @Test
     void findById_shouldFindPassenger_whenPassengerExists() {
         Long passengerId = PASSENGER_ID;
         Passenger passenger = getPassenger();
-        PassengerDto passengerDto = getPassengerDto();
 
-        when(passengerRepository.findById(passengerId)).thenReturn(Optional.of(passenger));
-        when(passengerMapper.toPassengerDto(passenger)).thenReturn(passengerDto);
+        when(passengerRepository.findById(passengerId))
+                .thenReturn(Optional.of(passenger));
 
         PassengerDto passengerResponse = passengerService.getById(passengerId);
 
         assertNotNull(passengerResponse);
         assertEquals(passenger.getId(), passengerResponse.id());
+        verify(passengerRepository).findById(passengerId);
     }
 
     @Test
     void findById_shouldThrowException_whenPassengerNotFound() {
         Long invalidId = 999L;
-        when(passengerRepository.findById(invalidId)).thenReturn(Optional.empty());
+
+        when(passengerRepository.findById(invalidId))
+                .thenReturn(Optional.empty());
+
         assertThrows(PassengerNotFoundException.class, () -> passengerService.getById(invalidId));
-        verify(passengerRepository, times(1)).findById(invalidId);
+        verify(passengerRepository).findById(invalidId);
     }
 
     @Test
@@ -136,37 +146,51 @@ class PassengerServiceImplTest {
         List<Passenger> passengerList = getPassengerList();
         List<PassengerDto> passengerDtos = getPassengerDtoList();
 
-        when(passengerRepository.findAll(any(PageRequest.class))).thenReturn(passengerPage);
-        when(passengerPage.getContent()).thenReturn(passengerList);
-        when(passengerPage.getTotalElements()).thenReturn((long) passengerList.size());
-        when(passengerMapper.toPassengerDto(passengerList.get(0))).thenReturn(passengerDtos.get(0));
-        when(passengerMapper.toPassengerDto(passengerList.get(1))).thenReturn(passengerDtos.get(1));
+        when(passengerRepository.findAll(any(PageRequest.class)))
+                .thenReturn(passengerPage);
+        when(passengerPage.getContent())
+                .thenReturn(passengerList);
+        when(passengerPage.getTotalElements())
+                .thenReturn((long) passengerList.size());
 
         PaginationDto<PassengerDto> paginationDto = passengerService.getAll(PAGE_NUMBER, PAGE_SIZE);
 
         assertNotNull(paginationDto);
         assertEquals(passengerDtos.size(), paginationDto.getTotalItems());
         assertEquals(passengerList.size(), passengerDtos.size());
+        verify(passengerRepository).findAll(any(PageRequest.class));
+        verify(passengerPage).getContent();
+        verify(passengerPage).getTotalElements();
     }
 
     @Test
     void deletePassenger_shouldDeletePassenger_whenPassengerExists() {
         Passenger passenger = getPassenger();
-        when(passengerRepository.findById(PASSENGER_ID)).thenReturn(Optional.of(passenger));
-        doNothing().when(passengerRepository).deleteById(PASSENGER_ID);
+
+        when(passengerRepository.findById(PASSENGER_ID))
+                .thenReturn(Optional.of(passenger));
+        doNothing().when(passengerRepository)
+                .deleteById(PASSENGER_ID);
 
         passengerService.deleteById(PASSENGER_ID);
-        verify(passengerRepository, times(1)).deleteById(PASSENGER_ID);
+
+        verify(passengerRepository).findById(PASSENGER_ID);
+        verify(passengerRepository).deleteById(PASSENGER_ID);
     }
 
     @Test
     void deletePassenger_shouldThrowException_whenPassengerNotFound() {
         Long passengerId = 999L;
-        when(passengerRepository.findById(passengerId)).thenReturn(Optional.empty());
-        assertThrows(
+
+        when(passengerRepository.findById(passengerId))
+                .thenReturn(Optional.empty());
+
+        PassengerNotFoundException exception = assertThrows(
                 PassengerNotFoundException.class,
                 () -> passengerService.deleteById(passengerId)
+
         );
+        assertEquals(MessageUtils.PASSENGER_NOT_FOUND_ERROR, exception.getMessage());
         verify(passengerRepository).findById(passengerId);
     }
 }
