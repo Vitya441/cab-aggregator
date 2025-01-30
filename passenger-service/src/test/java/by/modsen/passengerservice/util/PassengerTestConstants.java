@@ -8,15 +8,22 @@ import by.modsen.passengerservice.dto.response.PaginationDto;
 import by.modsen.passengerservice.dto.response.PassengerDto;
 import by.modsen.passengerservice.entity.Passenger;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class PassengerTestConstants {
 
     public static final Long PASSENGER_ID = 1L;
     public static final String FIRST_NAME = "Viktor";
+    public static final String FIRST_NAME_DB = "John";
     public static final String LAST_NAME = "Maksimov";
+    public static final String LAST_NAME_DB = "Doe";
     public static final String PHONE = "+375292653480";
+    public static final String PHONE_FROM_DB = "1234567890";
     public static final String CUSTOMER_ID = "1zlisq21gokdfs";
+    public static final String CUSTOMER_ID_FROM_DB = "cust_001";
+    public static final String CUSTOMER_ID_FROM_WIREMOCK = "ABC_123_XYZ";
+    public static final LocalDate BIRTHDATE_DB = LocalDate.of(1985, 3, 25);
     public static final Long BALANCE = 1000L;
     public static final int PAGE_NUMBER = 0;
     public static final int PAGE_SIZE = 10;
@@ -42,9 +49,31 @@ public class PassengerTestConstants {
 
     public static Passenger getPassenger() {
         return Passenger.builder()
-                .id(PASSENGER_ID)
+                .customerId(CUSTOMER_ID)
                 .firstName(FIRST_NAME)
                 .lastName(LAST_NAME)
+                .build();
+    }
+
+    public static PassengerDto getFirstPassengerFromDb() {
+        return PassengerDto.builder()
+                .id(PASSENGER_ID)
+                .customerId(CUSTOMER_ID_FROM_DB)
+                .firstName(FIRST_NAME_DB)
+                .lastName(LAST_NAME_DB)
+                .phone(PHONE_FROM_DB)
+                .birthDate(BIRTHDATE_DB)
+                .build();
+    }
+
+    public static PassengerDto getUpdatedFirstPassengerFromDb() {
+        return PassengerDto.builder()
+                .id(PASSENGER_ID)
+                .customerId(CUSTOMER_ID_FROM_DB)
+                .firstName(FIRST_NAME_DB)
+                .lastName(LAST_NAME_DB)
+                .phone(PHONE)
+                .birthDate(BIRTHDATE_DB)
                 .build();
     }
 
@@ -69,8 +98,18 @@ public class PassengerTestConstants {
     public static PassengerDto getPassengerDto() {
         return PassengerDto.builder()
                 .id(PASSENGER_ID)
+                .customerId(CUSTOMER_ID)
                 .firstName(FIRST_NAME)
                 .lastName(LAST_NAME)
+                .build();
+    }
+
+    public static PassengerDto getPassengerDtoWire() {
+        return PassengerDto.builder()
+                .id(9L)
+                .firstName(FIRST_NAME)
+                .lastName(LAST_NAME)
+                .customerId(CUSTOMER_ID_FROM_WIREMOCK)
                 .build();
     }
 

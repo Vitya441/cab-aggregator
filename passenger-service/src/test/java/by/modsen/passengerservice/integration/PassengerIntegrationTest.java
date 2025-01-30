@@ -3,6 +3,7 @@ package by.modsen.passengerservice.integration;
 import by.modsen.passengerservice.config.DatabaseContainerConfig;
 import by.modsen.passengerservice.dto.request.PassengerCreateDto;
 import by.modsen.passengerservice.dto.request.PassengerUpdateDto;
+import by.modsen.passengerservice.dto.response.PassengerDto;
 import by.modsen.passengerservice.repository.PassengerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -25,7 +26,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static by.modsen.passengerservice.util.PassengerTestConstants.*;
-import static org.hamcrest.Matchers.equalTo;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
 @SpringBootTest(
@@ -74,14 +75,17 @@ class PassengerIntegrationTest extends DatabaseContainerConfig {
 
     @Test
     void getPassengerById_shouldReturnFirstPassenger() {
-        RestAssured.given()
+        PassengerDto expected = getFirstPassengerFromDb();
+
+        PassengerDto actual = RestAssured.given()
                 .when()
                 .get(BASE_URL + "/" + PASSENGER_ID)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("id", equalTo(1))
-                .body("firstName", equalTo("John"))
-                .body("lastName", equalTo("Doe"));
+                .extract()
+                .as(PassengerDto.class);
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -96,23 +100,27 @@ class PassengerIntegrationTest extends DatabaseContainerConfig {
     }
 
     @Test
-    void updatePassengerById_shouldReturnUpdatedPassenger() throws Exception {
+    void updatePassengerById_shouldReturnUpdatedPassenger() {
         PassengerUpdateDto updateDto = getPassengerUpdateDto();
+        PassengerDto expected = getUpdatedFirstPassengerFromDb();
 
-        RestAssured.given()
+        PassengerDto actual = RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(updateDto)
                 .when()
                 .put(BASE_URL + "/" + PASSENGER_ID)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("id", equalTo(1))
-                .body("firstName", equalTo("John"))
-                .body("phone", equalTo(PHONE));
+                .extract()
+                .as(PassengerDto.class);
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void createPassenger_shouldReturnCreatedPassenger() throws Exception {
+        PassengerDto expected = getPassengerDtoWire();
+
         wireMockServer.stubFor(WireMock.post(WireMock.urlMatching(RATING_PATH +"/\\d+"))
                 .willReturn(WireMock.aResponse()
                         .withBody("""
@@ -136,15 +144,17 @@ class PassengerIntegrationTest extends DatabaseContainerConfig {
 
         PassengerCreateDto createDto = getPassengerCreateDto();
 
-        RestAssured.given()
+        PassengerDto actual = RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(createDto)
                 .when()
                 .post(BASE_URL)
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .body("firstName", equalTo(FIRST_NAME))
-                .body("lastName", equalTo(LAST_NAME));
+                .extract()
+                .as(PassengerDto.class);
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     private static String asJsonString(final Object obj) {

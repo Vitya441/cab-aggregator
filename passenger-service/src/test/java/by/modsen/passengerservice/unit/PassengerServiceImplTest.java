@@ -66,8 +66,8 @@ class PassengerServiceImplTest {
 
         when(paymentClient.createCustomer(customerRequest))
                 .thenReturn(customerResponse);
-        doReturn(passenger)
-                .when(passengerRepository).save(any(Passenger.class));
+        when(passengerRepository.save(passenger))
+                .thenReturn(passenger);
         doNothing().when(ratingClient).
                 createPassengerRatingRecord(passenger.getId());
 
@@ -75,8 +75,8 @@ class PassengerServiceImplTest {
 
         assertEquals(passengerDto.firstName(), responseDto.firstName());
         assertEquals(passengerDto.lastName(), responseDto.lastName());
-        verify(ratingClient).createPassengerRatingRecord(passenger.getId());
-        verify(passengerRepository).save(any(Passenger.class));
+        verify(paymentClient).createCustomer(customerRequest);
+        verify(passengerRepository).save(passenger);
         verify(ratingClient).createPassengerRatingRecord(passenger.getId());
     }
 
@@ -125,7 +125,7 @@ class PassengerServiceImplTest {
         PassengerDto passengerResponse = passengerService.getById(passengerId);
 
         assertNotNull(passengerResponse);
-        assertEquals(passenger.getId(), passengerResponse.id());
+        assertEquals(passenger.getFirstName(), passengerResponse.firstName());
         verify(passengerRepository).findById(passengerId);
     }
 
