@@ -15,10 +15,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(name = "car")
@@ -26,6 +28,7 @@ import java.time.Instant;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = "driver")
 public class Car {
 
     @Id
@@ -62,4 +65,15 @@ public class Car {
     @UpdateTimestamp
     private Instant updatedAt;
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Car car = (Car) o;
+        return seats == car.seats && Objects.equals(id, car.id) && Objects.equals(driver, car.driver) && Objects.equals(licenseNumber, car.licenseNumber) && Objects.equals(color, car.color) && Objects.equals(brand, car.brand) && Objects.equals(model, car.model) && category == car.category && Objects.equals(createdAt, car.createdAt) && Objects.equals(updatedAt, car.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, driver, licenseNumber, color, seats, brand, model, category, createdAt, updatedAt);
+    }
 }

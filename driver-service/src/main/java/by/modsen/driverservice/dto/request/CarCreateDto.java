@@ -6,7 +6,9 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 public record CarCreateDto(
         @NotBlank(message = ExceptionMessageKeyConstants.VALIDATION_LICENCE_NUMBER)
         @Size(max = 20, message = ExceptionMessageKeyConstants.VALIDATION_LICENCE_NUMBER_SIZE)
