@@ -25,7 +25,10 @@ import static by.modsen.driverservice.util.CarTestConstants.getFirstCarFromDb;
 import static by.modsen.driverservice.util.DriverTestConstants.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = {
@@ -140,7 +143,6 @@ class DriverServiceImplIntegrationTest extends DriverIntegrationTestConfig {
         DriverDto driver = getDriverFromDb();
         CarDto car = getFirstCarFromDb();
 
-        // Выполняем запрос на привязку машины к водителю
         RestAssured.given()
                 .port(localServerPort)
                 .when()
