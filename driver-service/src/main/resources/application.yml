@@ -37,6 +37,15 @@ app:
       group-id: driver-group
     producer:
       topic: available-drivers-topic
+    driver-status-consumer:
+      topic: driver-status-topic
+      group-id: driver-group
+
+  feign-clients:
+    rating-service:
+      url: rating-service
+    payment-service:
+      url: payment-service
 
 
 ## Мозолит глаза когда не включена Kafka
@@ -44,10 +53,6 @@ app:
 #  level:
 #    org.apache.kafka.clients.NetworkClient: ERROR
 #    org.apache.kafka.clients: ERROR
-
-    driver-status-consumer:
-      topic: driver-status-topic
-      group-id: driver-group
 
 
 eureka:

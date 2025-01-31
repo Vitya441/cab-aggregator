@@ -13,19 +13,24 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(name = "driver")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
+@Builder
+@ToString(exclude = "car")
 public class Driver {
 
     @Id
@@ -66,5 +71,17 @@ public class Driver {
     @PrePersist
     private void prePersist() {
         status = DriverStatus.AVAILABLE;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Driver driver = (Driver) o;
+        return Objects.equals(id, driver.id) && Objects.equals(customerId, driver.customerId) && Objects.equals(car, driver.car) && Objects.equals(firstName, driver.firstName) && Objects.equals(lastName, driver.lastName) && Objects.equals(phone, driver.phone) && status == driver.status && Objects.equals(rejectedRideId, driver.rejectedRideId) && Objects.equals(createdAt, driver.createdAt) && Objects.equals(updatedAt, driver.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, customerId, car, firstName, lastName, phone, status, rejectedRideId, createdAt, updatedAt);
     }
 }
