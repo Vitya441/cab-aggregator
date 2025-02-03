@@ -3,6 +3,7 @@ package by.modsen.ridesservice.controller;
 import by.modsen.ridesservice.dto.request.RideRequest;
 import by.modsen.ridesservice.dto.response.PaginationDto;
 import by.modsen.ridesservice.dto.response.RideResponse;
+import by.modsen.ridesservice.dto.response.RideWithDriverResponse;
 import by.modsen.ridesservice.service.RideService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class RideController {
     }
 
     @GetMapping("/current")
-    public ResponseEntity<RideResponse> getCurrentRide(@RequestParam Long passengerId) {
+    public ResponseEntity<RideWithDriverResponse> getCurrentRide(@RequestParam Long passengerId) {
         return ResponseEntity.ok(rideService.getActiveRide(passengerId));
     }
 

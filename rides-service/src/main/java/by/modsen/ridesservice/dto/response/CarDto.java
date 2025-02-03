@@ -1,9 +1,7 @@
-package by.modsen.driverservice.dto.response;
+package by.modsen.ridesservice.dto.response;
 
-import by.modsen.driverservice.entity.enums.CarCategory;
-import lombok.Builder;
+import by.modsen.commonmodule.enumeration.CarCategory;
 
-@Builder
 public record CarDto(
         long id,
         String licenseNumber,

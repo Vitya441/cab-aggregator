@@ -3,6 +3,7 @@ package by.modsen.ridesservice.service;
 import by.modsen.ridesservice.dto.request.RideRequest;
 import by.modsen.ridesservice.dto.response.PaginationDto;
 import by.modsen.ridesservice.dto.response.RideResponse;
+import by.modsen.ridesservice.dto.response.RideWithDriverResponse;
 
 public interface RideService {
 
@@ -10,7 +11,7 @@ public interface RideService {
 
     void assignDriverToRide(Long driverId, Long rideId);
 
-    RideResponse getActiveRide(Long passengerId);
+    RideWithDriverResponse getActiveRide(Long passengerId);
 
     PaginationDto<RideResponse> getHistoryByPassengerId(Long passengerId, int page, int size, String sortField);
 
