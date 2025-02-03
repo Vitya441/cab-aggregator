@@ -89,14 +89,20 @@ public class RideController {
     }
 
     @PutMapping("{rideId}/rate-driver")
-    public ResponseEntity<Void> rateDriver(@PathVariable Long rideId, @RequestParam double rating) {
-        rideService.rateDriver(rideId, rating);
+    public ResponseEntity<Void> rateDriver(
+            @PathVariable Long rideId,
+            @RequestParam Long passengerId,
+            @RequestParam double rating) {
+        rideService.rateDriver(rideId, passengerId, rating);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("{rideId}/rate-passenger")
-    public ResponseEntity<Void> ratePassenger(@PathVariable Long rideId, @RequestParam double rating) {
-        rideService.ratePassenger(rideId, rating);
+    public ResponseEntity<Void> ratePassenger(
+            @PathVariable Long rideId,
+            @RequestParam Long driverId,
+            @RequestParam double rating) {
+        rideService.ratePassenger(rideId, driverId, rating);
         return ResponseEntity.ok().build();
     }
 }

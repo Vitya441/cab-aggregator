@@ -36,6 +36,17 @@ app:
     driver-notifications-producer:
       topic: driver-notifications-topic
 
+  feign-clients:
+    driver-service:
+      url: driver-service
+    passenger-service:
+      url: passenger-service
+    rating-service:
+      url: rating-service
+    payment-service:
+      url: payment-service
+    price-service:
+      url: price-service
 
 
 eureka:

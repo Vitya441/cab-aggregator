@@ -1,8 +1,11 @@
 package by.modsen.ridesservice.dto.response;
 
+import lombok.Builder;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Builder
 public record PassengerDto(
         long id,
         String customerId,

@@ -83,7 +83,6 @@ public class RideServiceImpl implements RideService {
         rideRepository.save(ride);
     }
 
-    //TODO: У водителя дожна быть машина которая должна возвращаться в DTO
     @Override
     public RideWithDriverResponse getActiveRide(Long passengerId) {
         PassengerDto passengerDto = passengerClient.getPassengerById(passengerId);
@@ -93,7 +92,6 @@ public class RideServiceImpl implements RideService {
 
         Long driverId = ride.getDriverId();
         DriverWithCarDto driverDto = driverClient.getByIdWithCar(driverId);
-        System.out.println("Driver Car: " + driverDto.car());
 
         return rideMapper.toDtoWithDriver(ride, driverDto);
     }
@@ -202,10 +200,10 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public void rateDriver(Long rideId, double rating) {
+    public void rateDriver(Long rideId, Long passengerId, double rating) {
         Ride ride = getRideByIdOrThrow(rideId);
         Long driverId = ride.getDriverId();
-        rideValidator.validateDriverRating(ride);
+        rideValidator.validateDriverRating(ride, passengerId);
         ratingClient.updateDriverRating(driverId, rating);
         ride.setRatedByPassenger(true);
 
@@ -213,10 +211,10 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public void ratePassenger(Long rideId, double rating) {
+    public void ratePassenger(Long rideId, Long driverId, double rating) {
         Ride ride = getRideByIdOrThrow(rideId);
         Long passenger = ride.getPassengerId();
-        rideValidator.validatePassengerRating(ride);
+        rideValidator.validatePassengerRating(ride, driverId);
         ratingClient.updatePassengerRating(passenger, rating);
         ride.setRatedByDriver(true);
 

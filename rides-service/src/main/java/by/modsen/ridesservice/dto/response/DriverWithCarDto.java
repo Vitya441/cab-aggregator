@@ -1,7 +1,9 @@
 package by.modsen.ridesservice.dto.response;
 
 import by.modsen.commonmodule.enumeration.DriverStatus;
+import lombok.Builder;
 
+@Builder
 public record DriverWithCarDto(
         long id,
         String customerId,

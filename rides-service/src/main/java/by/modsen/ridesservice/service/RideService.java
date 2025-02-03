@@ -25,7 +25,7 @@ public interface RideService {
 
     void endRide(Long rideId, Long driverId);
 
-    void rateDriver(Long rideId, double rating);
+    void rateDriver(Long rideId, Long passengerId, double rating);
 
-    void ratePassenger(Long rideId, double rating);
+    void ratePassenger(Long rideId, Long passengerId, double rating);
 }

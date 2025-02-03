@@ -32,15 +32,15 @@ public class RideValidator {
         }
     }
 
-    public void validateDriverRating(Ride ride) {
-        if (ride.getStatus() != RideStatus.COMPLETED || ride.getDriverId() == null || ride.isRatedByPassenger()) {
-            throw new RuntimeException("You cant rate this ride");
+    public void validateDriverRating(Ride ride, Long passengerId) {
+        if (ride.getStatus() != RideStatus.COMPLETED || !ride.getPassengerId().equals(passengerId) || ride.isRatedByPassenger()) {
+            throw new CantPerformOperationException(ExceptionMessageConstants.RIDE_CANNOT_RATE);
         }
     }
 
-    public void validatePassengerRating(Ride ride) {
-        if (ride.getStatus() != RideStatus.COMPLETED || ride.getPassengerId() == null || ride.isRatedByDriver()) {
-            throw new RuntimeException("You cant rate this ride");
+    public void validatePassengerRating(Ride ride, Long driverId) {
+        if (ride.getStatus() != RideStatus.COMPLETED || !ride.getDriverId().equals(driverId) || ride.isRatedByDriver()) {
+            throw new CantPerformOperationException(ExceptionMessageConstants.RIDE_CANNOT_RATE);
         }
     }
 }
