@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class OutboxProcessor {
     private final KafkaTemplate<String, NewUserDto> kafkaTemplate;
 
     @Scheduled(cron = "${app.scheduler.cron-every-5-seconds}")
+    @Transactional
     public void processOutboxMessages() {
         List<OutboxMessage> messages = outboxRepository.findBySentFalse();
 

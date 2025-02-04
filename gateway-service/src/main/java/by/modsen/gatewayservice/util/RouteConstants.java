@@ -5,7 +5,8 @@ import java.util.List;
 public final class RouteConstants {
 
     public static final List<String> PUBLIC_ROUTES = List.of(
-            "/api/v1/auth/**"
+            "/api/v1/auth/**",
+            "/api/v1/rides/**"
     );
 
     public static final List<String> PASSENGER_ROUTES = List.of(
