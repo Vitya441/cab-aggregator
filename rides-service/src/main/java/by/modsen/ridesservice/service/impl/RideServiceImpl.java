@@ -1,8 +1,6 @@
 package by.modsen.ridesservice.service.impl;
 
-import by.modsen.commonmodule.dto.DriverDto;
 import by.modsen.commonmodule.dto.DriverStatusEvent;
-import by.modsen.commonmodule.dto.PassengerDto;
 import by.modsen.commonmodule.dto.RequestedRideEvent;
 import by.modsen.commonmodule.enumeration.DriverStatus;
 import by.modsen.commonmodule.enumeration.RideStatus;
@@ -13,8 +11,12 @@ import by.modsen.ridesservice.client.PriceClient;
 import by.modsen.ridesservice.client.RatingClient;
 import by.modsen.ridesservice.dto.request.CustomerChargeRequest;
 import by.modsen.ridesservice.dto.request.RideRequest;
+import by.modsen.ridesservice.dto.response.DriverDto;
+import by.modsen.ridesservice.dto.response.DriverWithCarDto;
 import by.modsen.ridesservice.dto.response.PaginationDto;
+import by.modsen.ridesservice.dto.response.PassengerDto;
 import by.modsen.ridesservice.dto.response.RideResponse;
+import by.modsen.ridesservice.dto.response.RideWithDriverResponse;
 import by.modsen.ridesservice.entity.Ride;
 import by.modsen.ridesservice.exception.ActiveRideExistsException;
 import by.modsen.ridesservice.exception.NotFoundException;
@@ -81,15 +83,17 @@ public class RideServiceImpl implements RideService {
         rideRepository.save(ride);
     }
 
-    //TODO: У водителя дожна быть машина которая должна возвращаться в DTO
     @Override
-    public RideResponse getActiveRide(Long passengerId) {
+    public RideWithDriverResponse getActiveRide(Long passengerId) {
         PassengerDto passengerDto = passengerClient.getPassengerById(passengerId);
         Ride ride = rideRepository
                 .findByPassengerIdAndStatusIn(passengerDto.id(), RideStatusConstants.ACTIVE_STATUSES)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessageConstants.NO_ACTIVE_RIDE_FOUND));
 
-        return rideMapper.toDto(ride);
+        Long driverId = ride.getDriverId();
+        DriverWithCarDto driverDto = driverClient.getByIdWithCar(driverId);
+
+        return rideMapper.toDtoWithDriver(ride, driverDto);
     }
 
     @Override
@@ -196,10 +200,10 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public void rateDriver(Long rideId, double rating) {
+    public void rateDriver(Long rideId, Long passengerId, double rating) {
         Ride ride = getRideByIdOrThrow(rideId);
         Long driverId = ride.getDriverId();
-        rideValidator.validateDriverRating(ride);
+        rideValidator.validateDriverRating(ride, passengerId);
         ratingClient.updateDriverRating(driverId, rating);
         ride.setRatedByPassenger(true);
 
@@ -207,10 +211,10 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public void ratePassenger(Long rideId, double rating) {
+    public void ratePassenger(Long rideId, Long driverId, double rating) {
         Ride ride = getRideByIdOrThrow(rideId);
         Long passenger = ride.getPassengerId();
-        rideValidator.validatePassengerRating(ride);
+        rideValidator.validatePassengerRating(ride, driverId);
         ratingClient.updatePassengerRating(passenger, rating);
         ride.setRatedByDriver(true);
 

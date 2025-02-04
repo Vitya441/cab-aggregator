@@ -3,6 +3,7 @@ package by.modsen.ridesservice.controller;
 import by.modsen.ridesservice.dto.request.RideRequest;
 import by.modsen.ridesservice.dto.response.PaginationDto;
 import by.modsen.ridesservice.dto.response.RideResponse;
+import by.modsen.ridesservice.dto.response.RideWithDriverResponse;
 import by.modsen.ridesservice.service.RideService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class RideController {
     }
 
     @GetMapping("/current")
-    public ResponseEntity<RideResponse> getCurrentRide(@RequestParam Long passengerId) {
+    public ResponseEntity<RideWithDriverResponse> getCurrentRide(@RequestParam Long passengerId) {
         return ResponseEntity.ok(rideService.getActiveRide(passengerId));
     }
 
@@ -88,14 +89,20 @@ public class RideController {
     }
 
     @PutMapping("{rideId}/rate-driver")
-    public ResponseEntity<Void> rateDriver(@PathVariable Long rideId, @RequestParam double rating) {
-        rideService.rateDriver(rideId, rating);
+    public ResponseEntity<Void> rateDriver(
+            @PathVariable Long rideId,
+            @RequestParam Long passengerId,
+            @RequestParam double rating) {
+        rideService.rateDriver(rideId, passengerId, rating);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("{rideId}/rate-passenger")
-    public ResponseEntity<Void> ratePassenger(@PathVariable Long rideId, @RequestParam double rating) {
-        rideService.ratePassenger(rideId, rating);
+    public ResponseEntity<Void> ratePassenger(
+            @PathVariable Long rideId,
+            @RequestParam Long driverId,
+            @RequestParam double rating) {
+        rideService.ratePassenger(rideId, driverId, rating);
         return ResponseEntity.ok().build();
     }
 }

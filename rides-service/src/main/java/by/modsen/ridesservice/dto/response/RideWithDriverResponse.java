@@ -8,10 +8,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
-public record RideResponse(
+public record RideWithDriverResponse(
         Long id,
-        Long passengerId,
-        Long driverId,
+        DriverWithCarDto driver,
         String pickupAddress,
         String destinationAddress,
         BigDecimal estimatedCost,

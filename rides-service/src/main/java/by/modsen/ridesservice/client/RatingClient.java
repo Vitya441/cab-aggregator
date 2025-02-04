@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "rating-service")
+@FeignClient(name = "${app.feign-clients.rating-service.url}", contextId = "ratingClient")
 public interface RatingClient {
 
     @PutMapping("api/v1/ratings/drivers/{driverId}")

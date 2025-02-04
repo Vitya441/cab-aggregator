@@ -1,0 +1,2 @@
+DELETE FROM ride;
+ALTER SEQUENCE ride_id_seq  RESTART WITH 1;
