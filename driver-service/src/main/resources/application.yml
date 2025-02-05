@@ -40,6 +40,8 @@ app:
     driver-status-consumer:
       topic: driver-status-topic
       group-id: driver-group
+    rating-producer:
+      topic: driver-rating-topic
 
   feign-clients:
     rating-service:

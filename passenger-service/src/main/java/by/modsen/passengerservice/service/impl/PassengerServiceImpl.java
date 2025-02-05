@@ -1,15 +1,15 @@
 package by.modsen.passengerservice.service.impl;
 
 import by.modsen.passengerservice.client.PaymentClient;
-import by.modsen.passengerservice.client.RatingClient;
 import by.modsen.passengerservice.dto.request.CustomerRequest;
+import by.modsen.passengerservice.dto.request.PassengerCreateDto;
 import by.modsen.passengerservice.dto.request.PassengerUpdateDto;
 import by.modsen.passengerservice.dto.response.CustomerResponse;
 import by.modsen.passengerservice.dto.response.PaginationDto;
-import by.modsen.passengerservice.dto.request.PassengerCreateDto;
 import by.modsen.passengerservice.dto.response.PassengerDto;
 import by.modsen.passengerservice.entity.Passenger;
 import by.modsen.passengerservice.exception.PassengerNotFoundException;
+import by.modsen.passengerservice.kafka.RatingProducer;
 import by.modsen.passengerservice.mapper.PassengerMapper;
 import by.modsen.passengerservice.repository.PassengerRepository;
 import by.modsen.passengerservice.service.PassengerService;
@@ -30,7 +30,7 @@ public class PassengerServiceImpl implements PassengerService {
 
     private final PassengerRepository repository;
     private final PaymentClient paymentClient;
-    private final RatingClient ratingClient;
+    private final RatingProducer ratingProducer;
     private final PassengerMapper passengerMapper;
     private final PassengerValidator validator;
 
@@ -45,7 +45,7 @@ public class PassengerServiceImpl implements PassengerService {
         CustomerResponse customerResponse = paymentClient.createCustomer(customerRequest);
         passenger.setCustomerId(customerResponse.customerId());
         passenger = repository.save(passenger);
-        ratingClient.createPassengerRatingRecord(passenger.getId());
+        ratingProducer.sendMessage(passenger.getId());
 
         return passengerMapper.toPassengerDto(passenger);
     }

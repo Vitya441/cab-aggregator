@@ -1,5 +1,6 @@
-package by.modsen.passengerservice.kafka;
+package by.modsen.passengerservice.config;
 
+import by.modsen.passengerservice.kafka.NewUserDto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
