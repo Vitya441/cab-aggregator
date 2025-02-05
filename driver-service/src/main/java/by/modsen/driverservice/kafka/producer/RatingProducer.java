@@ -22,7 +22,7 @@ public class RatingProducer {
     }
 
     public void sendMessage(Long passengerId) {
-        log.info("Sending rating to topic, passengerId = {}", passengerId);
+        log.info("Sending rating to topic, driverId = {}", passengerId);
         kafkaTemplate.send(TOPIC_NAME, passengerId);
     }
 }
