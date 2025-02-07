@@ -1,7 +1,6 @@
 package by.modsen.driverservice.service.impl;
 
 import by.modsen.driverservice.client.PaymentClient;
-import by.modsen.driverservice.client.RatingClient;
 import by.modsen.driverservice.dto.request.CustomerRequest;
 import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.request.DriverUpdateDto;
@@ -14,6 +13,7 @@ import by.modsen.driverservice.entity.Driver;
 import by.modsen.driverservice.exception.CarAlreadyAssignedException;
 import by.modsen.driverservice.exception.NotFoundException;
 import by.modsen.driverservice.exception.PhoneExistsException;
+import by.modsen.driverservice.kafka.producer.RatingProducer;
 import by.modsen.driverservice.mapper.DriverMapper;
 import by.modsen.driverservice.repository.CarRepository;
 import by.modsen.driverservice.repository.DriverRepository;
@@ -34,7 +34,7 @@ public class DriverServiceImpl implements DriverService {
 
     private final DriverRepository driverRepository;
     private final PaymentClient paymentClient;
-    private final RatingClient ratingClient;
+    private final RatingProducer ratingProducer;
     private final CarRepository carRepository;
     private final DriverMapper driverMapper;
 
@@ -98,7 +98,7 @@ public class DriverServiceImpl implements DriverService {
         CustomerResponse customerResponse = paymentClient.createCustomer(customerRequest);
         driver.setCustomerId(customerResponse.customerId());
         driver = driverRepository.save(driver);
-        ratingClient.createDriverRatingRecord(driver.getId());
+        ratingProducer.sendMessage(driver.getId());
 
         return driverMapper.toDto(driver);
     }

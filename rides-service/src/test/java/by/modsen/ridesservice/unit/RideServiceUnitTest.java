@@ -2,12 +2,8 @@ package by.modsen.ridesservice.unit;
 
 import by.modsen.commonmodule.dto.RequestedRideEvent;
 import by.modsen.commonmodule.enumeration.RideStatus;
-import by.modsen.ridesservice.client.DriverClient;
-import by.modsen.ridesservice.client.PassengerClient;
-import by.modsen.ridesservice.client.PaymentClient;
-import by.modsen.ridesservice.client.PriceClient;
-import by.modsen.ridesservice.client.RatingClient;
 import by.modsen.ridesservice.dto.request.RideRequest;
+import by.modsen.ridesservice.dto.response.DriverDto;
 import by.modsen.ridesservice.dto.response.DriverWithCarDto;
 import by.modsen.ridesservice.dto.response.PaginationDto;
 import by.modsen.ridesservice.dto.response.PassengerDto;
@@ -19,6 +15,11 @@ import by.modsen.ridesservice.kafka.producer.RequestedRidesProducer;
 import by.modsen.ridesservice.mapper.RideMapper;
 import by.modsen.ridesservice.mapper.RideMapperImpl;
 import by.modsen.ridesservice.repository.RideRepository;
+import by.modsen.ridesservice.service.DriverService;
+import by.modsen.ridesservice.service.PassengerService;
+import by.modsen.ridesservice.service.PaymentService;
+import by.modsen.ridesservice.service.PriceService;
+import by.modsen.ridesservice.service.RatingService;
 import by.modsen.ridesservice.service.impl.RideServiceImpl;
 import by.modsen.ridesservice.util.RideStatusConstants;
 import by.modsen.ridesservice.util.RideValidator;
@@ -56,19 +57,19 @@ class RideServiceUnitTest {
     private RideMapper rideMapper = new RideMapperImpl();
 
     @Mock
-    private PassengerClient passengerClient;
+    private PassengerService passengerService;
 
     @Mock
-    private DriverClient driverClient;
+    private DriverService driverService;
 
     @Mock
-    private PriceClient priceClient;
+    private PriceService priceService;
 
     @Mock
-    private PaymentClient paymentClient;
+    private PaymentService paymentService;
 
     @Mock
-    private RatingClient ratingClient;
+    private RatingService ratingService;
 
     @Mock
     private RideValidator rideValidator;
@@ -88,11 +89,11 @@ class RideServiceUnitTest {
         RequestedRideEvent rideEvent = new RequestedRideEvent(RIDE_ID, PICKUP_ADDRESS);
         ride.setEstimatedCost(ESTIMATED_COST.divide(BigDecimal.valueOf(100)));
 
-        when(passengerClient.getPassengerById(PASSENGER_ID))
+        when(passengerService.getPassengerById(PASSENGER_ID))
                 .thenReturn(passengerDto);
         when(rideRepository.existsByPassengerIdAndStatusNot(PASSENGER_ID, RideStatus.COMPLETED))
                 .thenReturn(false);
-        when(priceClient.calculatePriceForRide(rideRequest))
+        when(priceService.calculatePriceForRide(rideRequest))
                 .thenReturn(ESTIMATED_COST);
         when(rideRepository.save(ride))
                 .thenReturn(savedRide);
@@ -101,9 +102,9 @@ class RideServiceUnitTest {
 
         rideService.requestRide(rideRequest);
 
-        verify(passengerClient).getPassengerById(PASSENGER_ID);
+        verify(passengerService).getPassengerById(PASSENGER_ID);
         verify(rideRepository).existsByPassengerIdAndStatusNot(PASSENGER_ID, RideStatus.COMPLETED);
-        verify(priceClient).calculatePriceForRide(rideRequest);
+        verify(priceService).calculatePriceForRide(rideRequest);
         verify(rideRepository).save(ride);
         verify(ridesProducer).sendEvent(rideEvent);
     }
@@ -130,11 +131,11 @@ class RideServiceUnitTest {
         DriverWithCarDto driverDto = getDriverWithCarDto();
         Ride ride = getRide();
 
-        when(passengerClient.getPassengerById(PASSENGER_ID))
+        when(passengerService.getPassengerById(PASSENGER_ID))
                 .thenReturn(passengerDto);
         when(rideRepository.findByPassengerIdAndStatusIn(passengerDto.id(), RideStatusConstants.ACTIVE_STATUSES))
                 .thenReturn(Optional.of(ride));
-        when(driverClient.getByIdWithCar(ride.getDriverId()))
+        when(driverService.getByIdWithCar(ride.getDriverId()))
                 .thenReturn(driverDto);
 
         RideWithDriverResponse actualRide = rideService.getActiveRide(PASSENGER_ID);
@@ -181,13 +182,13 @@ class RideServiceUnitTest {
                 ridesPage.getTotalPages()
         );
 
-        when(passengerClient.getPassengerById(PASSENGER_ID)).thenReturn(passengerDto);
+        when(passengerService.getPassengerById(PASSENGER_ID)).thenReturn(passengerDto);
         when(rideRepository.findAllByPassengerIdAndStatus(passengerDto.id(), RideStatus.COMPLETED, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField))))
                 .thenReturn(ridesPage);
 
         PaginationDto<RideResponse> result = rideService.getHistoryByPassengerId(PASSENGER_ID, page, size, sortField);
         assertEquals(expectedPagination.content(), result.content());
-        verify(passengerClient).getPassengerById(PASSENGER_ID);
+        verify(passengerService).getPassengerById(PASSENGER_ID);
         verify(rideRepository).findAllByPassengerIdAndStatus(passengerDto.id(), RideStatus.COMPLETED, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField)));
     }
 
@@ -196,7 +197,7 @@ class RideServiceUnitTest {
         int page = 0;
         int size = 10;
         String sortField = "id";
-        PassengerDto passengerDto = getPassengerDto();
+        DriverDto driverDto = getDriverDto();
         Ride ride1 = getRide();
         Ride ride2 = getSecondRide();
         Page<Ride> ridesPage = new PageImpl<>(List.of(ride1, ride2), PageRequest.of(page, size), 2);
@@ -211,13 +212,14 @@ class RideServiceUnitTest {
                 ridesPage.getTotalPages()
         );
 
-        when(passengerClient.getPassengerById(DRIVER_ID)).thenReturn(passengerDto);
-        when(rideRepository.findAllByPassengerIdAndStatus(passengerDto.id(), RideStatus.COMPLETED, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField))))
+        when(driverService.getDriverById(DRIVER_ID)).thenReturn(driverDto);
+        when(rideRepository.findAllByDriverIdAndStatus(driverDto.id(), RideStatus.COMPLETED, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField))))
                 .thenReturn(ridesPage);
 
-        PaginationDto<RideResponse> result = rideService.getHistoryByPassengerId(DRIVER_ID, page, size, sortField);
+        PaginationDto<RideResponse> result = rideService.getHistoryByDriverId(DRIVER_ID, page, size, sortField);
+
         assertEquals(expectedPagination.content(), result.content());
-        verify(passengerClient).getPassengerById(DRIVER_ID);
-        verify(rideRepository).findAllByPassengerIdAndStatus(passengerDto.id(), RideStatus.COMPLETED, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField)));
+        verify(driverService).getDriverById(DRIVER_ID);
+        verify(rideRepository).findAllByDriverIdAndStatus(driverDto.id(), RideStatus.COMPLETED, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField)));
     }
 }

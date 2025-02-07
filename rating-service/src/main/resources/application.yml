@@ -18,6 +18,20 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  kafka:
+    bootstrap-servers: localhost:29092
+
+app:
+  kafka:
+    passenger-rating-consumer:
+      topic: passenger-rating-topic
+      groupId: rating-group
+    driver-rating-consumer:
+      topic: driver-rating-topic
+      groupId: rating-group
+
+
+
 eureka:
   client:
     service-url:

@@ -23,13 +23,15 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092
 
-
 app:
   kafka:
     consumer:
       topic: passenger-topic
       group-id: passenger-group
       type-mappings: "by.modsen.authservice.dto.NewUserDto:by.modsen.passengerservice.kafka.NewUserDto"
+    rating-producer:
+      topic: passenger-rating-topic
+
 
   feign-clients:
     rating-service:

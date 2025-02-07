@@ -6,6 +6,7 @@ import by.modsen.commonmodule.enumeration.RideStatus;
 import by.modsen.ridesservice.dto.request.Point;
 import by.modsen.ridesservice.dto.request.RideRequest;
 import by.modsen.ridesservice.dto.response.CarDto;
+import by.modsen.ridesservice.dto.response.DriverDto;
 import by.modsen.ridesservice.dto.response.DriverWithCarDto;
 import by.modsen.ridesservice.dto.response.PassengerDto;
 import by.modsen.ridesservice.dto.response.RideResponse;
@@ -136,6 +137,12 @@ public final class RideTestConstants {
         return DriverWithCarDto.builder()
                 .id(DRIVER_ID)
                 .car(getCarDto())
+                .build();
+    }
+
+    public static DriverDto getDriverDto() {
+        return DriverDto.builder()
+                .id(DRIVER_ID)
                 .build();
     }
 

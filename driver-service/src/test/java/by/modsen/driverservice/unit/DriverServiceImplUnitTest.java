@@ -1,7 +1,6 @@
 package by.modsen.driverservice.unit;
 
 import by.modsen.driverservice.client.PaymentClient;
-import by.modsen.driverservice.client.RatingClient;
 import by.modsen.driverservice.dto.request.CustomerRequest;
 import by.modsen.driverservice.dto.request.DriverCreateDto;
 import by.modsen.driverservice.dto.request.DriverUpdateDto;
@@ -12,6 +11,7 @@ import by.modsen.driverservice.entity.Car;
 import by.modsen.driverservice.entity.Driver;
 import by.modsen.driverservice.exception.CarAlreadyAssignedException;
 import by.modsen.driverservice.exception.NotFoundException;
+import by.modsen.driverservice.kafka.producer.RatingProducer;
 import by.modsen.driverservice.mapper.DriverMapper;
 import by.modsen.driverservice.mapper.DriverMapperImpl;
 import by.modsen.driverservice.repository.CarRepository;
@@ -52,7 +52,7 @@ class DriverServiceImplUnitTest {
     private PaymentClient paymentClient;
 
     @Mock
-    private RatingClient ratingClient;
+    private RatingProducer ratingProducer;
 
     @Mock
     private CarRepository carRepository;
@@ -103,7 +103,7 @@ class DriverServiceImplUnitTest {
         when(paymentClient.createCustomer(customerRequest))
                 .thenReturn(customerResponse);
         doNothing()
-                .when(ratingClient).createDriverRatingRecord(DRIVER_ID);
+                .when(ratingProducer).sendMessage(DRIVER_ID);
 
         DriverDto driverResponse = driverService.create(createDto);
 
@@ -111,7 +111,7 @@ class DriverServiceImplUnitTest {
         assertEquals(driverDto.customerId(), driverResponse.customerId());
         verify(driverRepository).save(driver);
         verify(paymentClient).createCustomer(customerRequest);
-        verify(ratingClient).createDriverRatingRecord(DRIVER_ID);
+        verify(ratingProducer).sendMessage(DRIVER_ID);
     }
 
     @Test

@@ -4,11 +4,6 @@ import by.modsen.commonmodule.dto.DriverStatusEvent;
 import by.modsen.commonmodule.dto.RequestedRideEvent;
 import by.modsen.commonmodule.enumeration.DriverStatus;
 import by.modsen.commonmodule.enumeration.RideStatus;
-import by.modsen.ridesservice.client.DriverClient;
-import by.modsen.ridesservice.client.PassengerClient;
-import by.modsen.ridesservice.client.PaymentClient;
-import by.modsen.ridesservice.client.PriceClient;
-import by.modsen.ridesservice.client.RatingClient;
 import by.modsen.ridesservice.dto.request.CustomerChargeRequest;
 import by.modsen.ridesservice.dto.request.RideRequest;
 import by.modsen.ridesservice.dto.response.DriverDto;
@@ -19,11 +14,16 @@ import by.modsen.ridesservice.dto.response.RideResponse;
 import by.modsen.ridesservice.dto.response.RideWithDriverResponse;
 import by.modsen.ridesservice.entity.Ride;
 import by.modsen.ridesservice.exception.ActiveRideExistsException;
-import by.modsen.ridesservice.exception.NotFoundException;
+import by.modsen.ridesservice.exception.RideNotFoundException;
 import by.modsen.ridesservice.kafka.producer.DriverStatusProducer;
 import by.modsen.ridesservice.kafka.producer.RequestedRidesProducer;
 import by.modsen.ridesservice.mapper.RideMapper;
 import by.modsen.ridesservice.repository.RideRepository;
+import by.modsen.ridesservice.service.DriverService;
+import by.modsen.ridesservice.service.PassengerService;
+import by.modsen.ridesservice.service.PaymentService;
+import by.modsen.ridesservice.service.PriceService;
+import by.modsen.ridesservice.service.RatingService;
 import by.modsen.ridesservice.service.RideService;
 import by.modsen.ridesservice.util.ExceptionMessageConstants;
 import by.modsen.ridesservice.util.RideStatusConstants;
@@ -46,23 +46,23 @@ public class RideServiceImpl implements RideService {
 
     private final RideRepository rideRepository;
     private final RideMapper rideMapper;
-    private final PassengerClient passengerClient;
-    private final DriverClient driverClient;
-    private final PriceClient priceClient;
-    private final PaymentClient paymentClient;
-    private final RatingClient ratingClient;
+    private final PassengerService passengerService;
+    private final DriverService driverService;
+    private final PriceService priceService;
+    private final PaymentService paymentService;
+    private final RatingService ratingService;
     private final RideValidator rideValidator;
     private final RequestedRidesProducer ridesProducer;
     private final DriverStatusProducer driverStatusProducer;
 
     @Override
     public void requestRide(RideRequest rideRequest) {
-        PassengerDto passengerDto = passengerClient.getPassengerById(rideRequest.passengerId());
+        PassengerDto passengerDto = passengerService.getPassengerById(rideRequest.passengerId());
         if (rideRepository.existsByPassengerIdAndStatusNot(passengerDto.id(), RideStatus.COMPLETED)) {
             throw new ActiveRideExistsException(ExceptionMessageConstants.ACTIVE_RIDE_EXISTS);
         }
         Ride ride = rideMapper.toEntity(rideRequest);
-        BigDecimal cost = priceClient.calculatePriceForRide(rideRequest).divide(BigDecimal.valueOf(100));
+        BigDecimal cost = priceService.calculatePriceForRide(rideRequest).divide(BigDecimal.valueOf(100));
         ride.setEstimatedCost(cost);
         ride = rideRepository.save(ride);
 
@@ -85,13 +85,13 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public RideWithDriverResponse getActiveRide(Long passengerId) {
-        PassengerDto passengerDto = passengerClient.getPassengerById(passengerId);
+        PassengerDto passengerDto = passengerService.getPassengerById(passengerId);
         Ride ride = rideRepository
                 .findByPassengerIdAndStatusIn(passengerDto.id(), RideStatusConstants.ACTIVE_STATUSES)
-                .orElseThrow(() -> new NotFoundException(ExceptionMessageConstants.NO_ACTIVE_RIDE_FOUND));
+                .orElseThrow(() -> new RideNotFoundException(ExceptionMessageConstants.NO_ACTIVE_RIDE_FOUND));
 
         Long driverId = ride.getDriverId();
-        DriverWithCarDto driverDto = driverClient.getByIdWithCar(driverId);
+        DriverWithCarDto driverDto = driverService.getByIdWithCar(driverId);
 
         return rideMapper.toDtoWithDriver(ride, driverDto);
     }
@@ -140,7 +140,7 @@ public class RideServiceImpl implements RideService {
         Ride ride = getRideByIdOrThrow(rideId);
         rideValidator.validateEnding(ride, driverId);
 
-        PassengerDto passenger = passengerClient.getPassengerById(ride.getPassengerId());
+        PassengerDto passenger = passengerService.getPassengerById(ride.getPassengerId());
         Long amount = ride.getEstimatedCost().longValue();
         CustomerChargeRequest chargeRequest = CustomerChargeRequest.builder()
                 .customerId(passenger.customerId())
@@ -148,7 +148,7 @@ public class RideServiceImpl implements RideService {
                 .amount(amount)
                 .build();
 
-        paymentClient.chargeFromCustomer(chargeRequest);
+        paymentService.chargeFromCustomer(chargeRequest);
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
         rideRepository.save(ride);
@@ -163,7 +163,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public PaginationDto<RideResponse> getHistoryByPassengerId(Long passengerId, int page, int size, String sortField) {
-        PassengerDto passengerDto = passengerClient.getPassengerById(passengerId);
+        PassengerDto passengerDto = passengerService.getPassengerById(passengerId);
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
 
         Page<Ride> ridesPage = rideRepository.findAllByPassengerIdAndStatus(passengerDto.id(), RideStatus.COMPLETED, pageRequest);
@@ -182,7 +182,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public PaginationDto<RideResponse> getHistoryByDriverId(Long driverId, int page, int size, String sortField) {
-        DriverDto driverDto =driverClient.getDriverById(driverId);
+        DriverDto driverDto =driverService.getDriverById(driverId);
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortField));
 
         Page<Ride> ridesPage = rideRepository.findAllByDriverIdAndStatus(driverDto.id(), RideStatus.COMPLETED, pageRequest);
@@ -204,7 +204,7 @@ public class RideServiceImpl implements RideService {
         Ride ride = getRideByIdOrThrow(rideId);
         Long driverId = ride.getDriverId();
         rideValidator.validateDriverRating(ride, passengerId);
-        ratingClient.updateDriverRating(driverId, rating);
+        ratingService.updateDriverRating(driverId, rating);
         ride.setRatedByPassenger(true);
 
         rideRepository.save(ride);
@@ -213,9 +213,9 @@ public class RideServiceImpl implements RideService {
     @Override
     public void ratePassenger(Long rideId, Long driverId, double rating) {
         Ride ride = getRideByIdOrThrow(rideId);
-        Long passenger = ride.getPassengerId();
+        Long passengerId = ride.getPassengerId();
         rideValidator.validatePassengerRating(ride, driverId);
-        ratingClient.updatePassengerRating(passenger, rating);
+        ratingService.updatePassengerRating(passengerId, rating);
         ride.setRatedByDriver(true);
 
         rideRepository.save(ride);
@@ -224,6 +224,6 @@ public class RideServiceImpl implements RideService {
     private Ride getRideByIdOrThrow(Long rideId) {
         return rideRepository
                 .findById(rideId)
-                .orElseThrow(() -> new NotFoundException(ExceptionMessageConstants.RIDE_NOT_FOUND));
+                .orElseThrow(() -> new RideNotFoundException(ExceptionMessageConstants.RIDE_NOT_FOUND));
     }
 }

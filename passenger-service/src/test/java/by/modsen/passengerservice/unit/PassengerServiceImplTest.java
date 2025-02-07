@@ -1,7 +1,6 @@
 package by.modsen.passengerservice.unit;
 
 import by.modsen.passengerservice.client.PaymentClient;
-import by.modsen.passengerservice.client.RatingClient;
 import by.modsen.passengerservice.dto.request.CustomerRequest;
 import by.modsen.passengerservice.dto.request.PassengerCreateDto;
 import by.modsen.passengerservice.dto.request.PassengerUpdateDto;
@@ -10,6 +9,7 @@ import by.modsen.passengerservice.dto.response.PaginationDto;
 import by.modsen.passengerservice.dto.response.PassengerDto;
 import by.modsen.passengerservice.entity.Passenger;
 import by.modsen.passengerservice.exception.PassengerNotFoundException;
+import by.modsen.passengerservice.kafka.RatingProducer;
 import by.modsen.passengerservice.mapper.PassengerMapper;
 import by.modsen.passengerservice.mapper.PassengerMapperImpl;
 import by.modsen.passengerservice.repository.PassengerRepository;
@@ -48,7 +48,7 @@ class PassengerServiceImplTest {
     private PaymentClient paymentClient;
 
     @Mock
-    private RatingClient ratingClient;
+    private RatingProducer ratingProducer;
 
     @Spy
     private PassengerMapper passengerMapper = new PassengerMapperImpl();
@@ -68,8 +68,8 @@ class PassengerServiceImplTest {
                 .thenReturn(customerResponse);
         when(passengerRepository.save(passenger))
                 .thenReturn(passenger);
-        doNothing().when(ratingClient).
-                createPassengerRatingRecord(passenger.getId());
+        doNothing().when(ratingProducer).
+                sendMessage(passenger.getId());
 
         PassengerDto responseDto = passengerService.create(passengerCreateDto);
 
@@ -77,7 +77,7 @@ class PassengerServiceImplTest {
         assertEquals(passengerDto.lastName(), responseDto.lastName());
         verify(paymentClient).createCustomer(customerRequest);
         verify(passengerRepository).save(passenger);
-        verify(ratingClient).createPassengerRatingRecord(passenger.getId());
+        verify(ratingProducer).sendMessage(passenger.getId());
     }
 
     @Test
