@@ -1,5 +1,235 @@
 services:
 
+  eureka-server:
+    build: ./eureka-server
+#    image: vitya4485/eureka-server:0.1
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - cab_aggregator
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    ports:
+      - "8000:8000"
+    networks:
+      - cab_aggregator
+    depends_on:
+      - eureka-server
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/test-realm
+
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8083:8083"
+    networks:
+      - cab_aggregator
+    depends_on:
+      - eureka-server
+      - keycloak
+      - postgres_db
+      - kafka
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
+      # База данных
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: vitya
+      SPRING_DATASOURCE_PASSWORD: 22817
+      # Kafka (29092 - 9092)
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # Keycloak
+      APP_KEYCLOAK_SERVER_URL: http://keycloak:8080
+      APP_KEYCLOAK_REALM: test-realm
+      APP_KEYCLOAK_ADMIN_CLIENT_ID: admin-cli
+      APP_KEYCLOAK_ADMIN_CLIENT_SECRET: qRvkv9o9HAf9ztQpJY6c97nOUQj8DQsw
+
+
+  passenger-service:
+    build: ./passenger-service
+    container_name: passenger-service
+    ports:
+      - "8080:8080"
+    networks:
+      - cab_aggregator
+    depends_on:
+      - eureka-server
+      - postgres_db
+      - rating-service
+      - payment-service
+      - kafka
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/passenger_db
+      SPRING_DATASOURCE_USERNAME: vitya
+      SPRING_DATASOURCE_PASSWORD: 22817
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+
+  driver-service:
+    build: ./driver-service
+    container_name: driver-service
+    ports:
+      - "8081:8081"
+    networks:
+      - cab_aggregator
+    depends_on:
+      - eureka-server
+      - postgres_db
+      - kafka
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/driver_db
+      SPRING_DATASOURCE_USERNAME: vitya
+      SPRING_DATASOURCE_PASSWORD: 22817
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  rides-service:
+    build: ./rides-service
+    container_name: rides-service
+    ports:
+      - "8084:8084"
+    networks:
+      - cab_aggregator
+    depends_on:
+      - eureka-server
+      - postgres_db
+      - passenger-service
+      - driver-service
+      - payment-service
+      - price-service
+      - rating-service
+      - kafka
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/ride_db
+      SPRING_DATASOURCE_USERNAME: vitya
+      SPRING_DATASOURCE_PASSWORD: 22817
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8088:8088"
+    networks:
+      - cab_aggregator
+    depends_on:
+      - eureka-server
+      - postgres_db
+      - kafka
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/payment_db
+      SPRING_DATASOURCE_USERNAME: vitya
+      SPRING_DATASOURCE_PASSWORD: 22817
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      APP_STRIPE_SECRET_KEY: sk_test_51QdJXnHl2Zd6NhlOJ77EYLnSMyPEkUxwasKn6aUXNK6tWuFRhZCJGe46UJVU0i2ZI8MoIJmAB8rGRJsfTqW7WaXx00bNzDsQrt
+      APP_STRIPE_PUBLIC_KEY: pk_test_51QdJXnHl2Zd6NhlOd0rz5nKjBSmc5aaTxbREQOPtmSbVJFfaLGsN7ePIhKksOfCsOoQErjaCEvLVUd90dkrEZlU000vXNVEvkb
+
+
+  rating-service:
+    build: ./rating-service
+    container_name: rating-service
+    ports:
+      - "8085:8085"
+    networks:
+      - cab_aggregator
+    depends_on:
+      - eureka-server
+      - postgres_db
+      - kafka
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/rating_db
+      SPRING_DATASOURCE_USERNAME: vitya
+      SPRING_DATASOURCE_PASSWORD: 22817
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+
+  price-service:
+    build: ./price-service
+    container_name: price-service
+    ports:
+      - "8087:8087"
+    networks:
+      - cab_aggregator
+    depends_on:
+      - eureka-server
+      - postgres_db
+      - promocode-service
+      - kafka
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/price_db
+      SPRING_DATASOURCE_USERNAME: vitya
+      SPRING_DATASOURCE_PASSWORD: 22817
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  promocode-service:
+    build: ./promocode-service
+    container_name: promocode-service
+    ports:
+      - "8086:8086"
+    networks:
+      - cab_aggregator
+    depends_on:
+      - eureka-server
+      - gateway-service
+      - mongodb
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/promocode_db
+
+
+
+### Попытка в один контейнер для всех Баз Данных
+### docker volume prune - очистишь данные
+### docker compose down -v
+  postgres_db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: vitya
+      POSTGRES_PASSWORD: 22817
+    networks:
+      - cab_aggregator
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - "5434:5432"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "9090:8080"
+    networks:
+      - cab_aggregator
+    command: [ "start-dev", "--import-realm" ]
+    volumes:
+      - ./auth-service/docker/keycloak/realms/:/opt/keycloak/data/import/
+
+
+  mongodb:
+    image: mongo:6-jammy
+    ports:
+      - "27017:27017"
+    networks:
+      - cab_aggregator
+    volumes:
+      - mongo_data:/data/db
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
@@ -7,16 +237,21 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - 22181:2181
+    networks:
+      - cab_aggregator
 
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:
-      - 29092:29092
+      - 29092:9092
+    networks:
+      - cab_aggregator
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      ### TODO: Одинаковые порты для kafka: и localhost:, сделал правильный для контейнера и заработало
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
@@ -28,7 +263,18 @@ services:
       - kafka
     ports:
       - 8090:8080
+    networks:
+      - cab_aggregator
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+
+
+networks:
+  cab_aggregator:
+    driver: bridge
+
+volumes:
+  pg_data:
+  mongo_data:
