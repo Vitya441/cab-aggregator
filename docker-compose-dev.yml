@@ -1,0 +1,119 @@
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "9091:8080"
+    networks:
+      - cab_aggregator
+    command: [ "start-dev", "--import-realm" ]
+    volumes:
+      - ./auth-service/docker/keycloak/realms/:/opt/keycloak/data/import/
+
+  mongodb:
+    image: mongo:6-jammy
+    ports:
+      - "27017:27017"
+    networks:
+      - cab_aggregator
+    volumes:
+      - mongo_data:/data/db
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+    networks:
+      - cab_aggregator
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    networks:
+      - cab_aggregator
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
+  elasticsearch:
+    image: elasticsearch:7.17.13
+    ports:
+      - "9200:9200"
+    networks:
+      - cab_aggregator
+    environment:
+      - discovery.type=single-node
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.13
+    ports:
+      - "5044:5044"
+    volumes:
+      - ./monitoring/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    networks:
+      - cab_aggregator
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.13
+    ports:
+      - "5601:5601"
+    networks:
+      - cab_aggregator
+
+  prometheus:
+    image: prom/prometheus:v3.0.0
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - cab_aggregator
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:11.4.1
+    container_name: grafana
+    networks:
+      - cab_aggregator
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    depends_on:
+      - prometheus
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - cab_aggregator
+
+
+networks:
+  cab_aggregator:
+    driver: bridge
+
+volumes:
+  pg_data:
+  mongo_data:
+  elasticsearch_data:
+

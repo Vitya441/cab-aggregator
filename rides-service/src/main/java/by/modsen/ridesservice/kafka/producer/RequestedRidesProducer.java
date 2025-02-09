@@ -17,6 +17,6 @@ public class RequestedRidesProducer {
 
     public void sendEvent(RequestedRideEvent rideEvent) {
         kafkaTemplate.send(TOPIC_NAME, rideEvent);
-        log.info("Send message: {}", rideEvent);
+        log.info("Send requested ride: {} to driver-service", rideEvent);
     }
 }
