@@ -79,8 +79,8 @@ public class RideServiceImpl implements RideService {
     public void assignDriverToRide(Long driverId, Long rideId) {
         Ride ride = getRideByIdOrThrow(rideId);
         ride.setDriverId(driverId);
-
         rideRepository.save(ride);
+        log.info("Driver with id = {} assigned to ride", driverId);
     }
 
     @Override
@@ -102,6 +102,7 @@ public class RideServiceImpl implements RideService {
         rideValidator.validateConfirmation(ride, driverId);
         ride.setStatus(RideStatus.ACCEPTED);
         rideRepository.save(ride);
+        log.info("Driver with id = {} confirmed the ride", driverId);
     }
 
     @Override
@@ -110,6 +111,7 @@ public class RideServiceImpl implements RideService {
         rideValidator.validateRejection(ride, driverId);
         ride.setDriverId(null);
         rideRepository.save(ride);
+        log.info("Driver with id = {} rejected the ride", driverId);
 
         DriverStatusEvent statusEvent = DriverStatusEvent.builder()
                 .rideId(rideId)
@@ -133,6 +135,7 @@ public class RideServiceImpl implements RideService {
         ride.setStatus(RideStatus.IN_PROGRESS);
         ride.setStartTime(LocalDateTime.now());
         rideRepository.save(ride);
+        log.info("Driver with id = {} started the ride", driverId);
     }
 
     @Override
@@ -152,6 +155,7 @@ public class RideServiceImpl implements RideService {
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
         rideRepository.save(ride);
+        log.info("Driver with id = {} finished the ride", driverId);
 
         DriverStatusEvent statusEvent = DriverStatusEvent.builder()
                 .driverId(driverId)

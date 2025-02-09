@@ -35,6 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
         Customer customer = stripeService.createStripeCustomer(customerRequest);
         stripeService.createPayment(customer.getId());
         saveAccountToDatabase(customer);
+        log.info("Creating customer with id: {}", customer.getId());
 
         return CustomerResponse.builder()
                 .customerId(customer.getId())
@@ -46,6 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public CustomerResponse getCustomer(String customerId) {
         Account account = getAccountByCustomerId(customerId);
+        log.info("Retrieving customer with id: {}", customerId);
 
         return CustomerResponse.builder()
                 .customerId(account.getCustomerId())
@@ -65,6 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         account.setBalance(account.getBalance() - chargeRequest.amount());
         accountRepository.save(account);
+        log.info("Charging from customer with id: {}", customerId);
 
         return ChargeResponse.builder()
                 .id(paymentIntent.getId())

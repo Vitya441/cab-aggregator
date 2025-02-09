@@ -12,6 +12,7 @@ import by.modsen.promocodeservice.repository.PromoCodeRepository;
 import by.modsen.promocodeservice.service.PromoCodeService;
 import by.modsen.promocodeservice.util.ExceptionMessageConstants;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -19,18 +20,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PromoCodeServiceImpl implements PromoCodeService {
 
     private final PromoCodeRepository repository;
-    private final PromoCodeMapper mapper;
+    private final PromoCodeMapper promoCodeMapper;
 
     @Override
     public PromoCodeResponse getById(String id) {
         PromoCode promoCode = getPromoCodeByIdOrThrow(id);
-
-        return mapper.toDto(promoCode);
+        log.info("Getting promo code by id: {}", promoCode.getId());
+        return promoCodeMapper.toDto(promoCode);
     }
 
     @Override
@@ -41,20 +43,22 @@ public class PromoCodeServiceImpl implements PromoCodeService {
         }
         promoCode.setCount(promoCode.getCount() - 1);
         promoCode = repository.save(promoCode);
+        log.info("Applying promo code with id: {}", promoCode.getId());
 
-        return mapper.toDto(promoCode);
+        return promoCodeMapper.toDto(promoCode);
     }
 
     @Override
     public PromoCodeResponse getByCode(String code) {
         PromoCode promoCode = getPromoCodeByCodeOrThrow(code);
-        return mapper.toDto(promoCode);
+        log.info("Getting promo code by code: {}", promoCode.getCode());
+        return promoCodeMapper.toDto(promoCode);
     }
 
     @Override
     public PromoCodeResponseList getAll() {
         List<PromoCode> promoCodes = repository.findAll();
-        List<PromoCodeResponse> promoCodeResponses = mapper.toDtoList(promoCodes);
+        List<PromoCodeResponse> promoCodeResponses = promoCodeMapper.toDtoList(promoCodes);
 
         return new PromoCodeResponseList(promoCodeResponses);
     }
@@ -62,7 +66,7 @@ public class PromoCodeServiceImpl implements PromoCodeService {
     public PaginatedResponse getAllPaginated(int pageNumber, int pageSize, String sortField) {
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortField));
         Page<PromoCode> promoCodePage = repository.findAll(pageRequest);
-        List<PromoCodeResponse> responseList = mapper.toDtoList(promoCodePage.getContent());
+        List<PromoCodeResponse> responseList = promoCodeMapper.toDtoList(promoCodePage.getContent());
 
         return PaginatedResponse.builder()
                 .promoCodes(responseList)
@@ -77,20 +81,22 @@ public class PromoCodeServiceImpl implements PromoCodeService {
         if (repository.existsByCode(promoCodeRequest.code())) {
             throw new CodeAlreadyExistsException(ExceptionMessageConstants.PROMOCODE_WITH_CODE_EXISTS, promoCodeRequest.code());
         }
-        PromoCode promoCode = mapper.toEntity(promoCodeRequest);
+        PromoCode promoCode = promoCodeMapper.toEntity(promoCodeRequest);
         promoCode = repository.save(promoCode);
+        log.info("Creating promo code with id: {}", promoCode.getId());
 
-        return mapper.toDto(promoCode);
+        return promoCodeMapper.toDto(promoCode);
     }
 
     @Override
     public PromoCodeResponse update(String id, PromoCodeRequest promoCodeRequest) {
         PromoCode promoCode = getPromoCodeByIdOrThrow(id);
         checkPossibilityToUpdate(promoCode, promoCodeRequest);
-        mapper.updateEntityFromDto(promoCodeRequest, promoCode);
+        promoCodeMapper.updateEntityFromDto(promoCodeRequest, promoCode);
         promoCode = repository.save(promoCode);
+        log.info("Updating promo code with id: {}", promoCode.getId());
 
-        return mapper.toDto(promoCode);
+        return promoCodeMapper.toDto(promoCode);
     }
 
     @Override
@@ -99,6 +105,7 @@ public class PromoCodeServiceImpl implements PromoCodeService {
             throw new PromoCodeNotFoundException(ExceptionMessageConstants.PROMOCODE_WITH_ID_NOT_FOUND, id);
         }
         repository.deleteById(id);
+        log.info("Deleting promo code with id: {}", id);
     }
 
     private PromoCode getPromoCodeByIdOrThrow(String id) {

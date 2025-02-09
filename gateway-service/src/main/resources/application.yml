@@ -35,7 +35,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:9090/realms/test-realm
+          issuer-uri: http://localhost:9091/realms/test-realm
 
 eureka:
   client:
