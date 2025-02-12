@@ -2,7 +2,6 @@ services:
 
   eureka-server:
     build: ./eureka-server
-#    image: vitya4485/eureka-server:0.1
     container_name: eureka-server
     ports:
       - "8761:8761"
@@ -33,8 +32,11 @@ services:
     depends_on:
       - eureka-server
       - keycloak
+      - passenger-service
+      - driver-service
       - postgres_db
       - kafka
+      - logstash
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/auth_db
@@ -56,12 +58,12 @@ services:
     networks:
       - cab_aggregator
     depends_on:
+      - logstash
       - eureka-server
       - postgres_db
+      - kafka
       - rating-service
       - payment-service
-      - logstash
-      - kafka
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/passenger_db
@@ -82,6 +84,7 @@ services:
       - eureka-server
       - postgres_db
       - kafka
+      - logstash
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/driver_db
@@ -106,6 +109,7 @@ services:
       - price-service
       - rating-service
       - kafka
+      - logstash
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/ride_db
@@ -125,6 +129,7 @@ services:
       - eureka-server
       - postgres_db
       - kafka
+      - logstash
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/payment_db
@@ -147,6 +152,7 @@ services:
       - eureka-server
       - postgres_db
       - kafka
+      - logstash
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/rating_db
@@ -168,6 +174,7 @@ services:
       - postgres_db
       - promocode-service
       - kafka
+      - logstash
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/price_db
@@ -188,6 +195,7 @@ services:
       - eureka-server
       - gateway-service
       - mongodb
+      - logstash
     environment:
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/promocode_db
@@ -221,7 +229,6 @@ services:
     volumes:
       - ./auth-service/docker/keycloak/realms/:/opt/keycloak/data/import/
 
-
   mongodb:
     image: mongo:6-jammy
     ports:
@@ -252,7 +259,6 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      ### TODO: Одинаковые порты для kafka: и localhost:, сделал правильный для контейнера и заработало
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
@@ -271,7 +277,6 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
 
-
   elasticsearch:
     image: elasticsearch:7.17.13
     ports:
@@ -286,9 +291,12 @@ services:
     ports:
       - "5044:5044"
     volumes:
-      - ./monitoring/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+#      - ./monitoring/logstash/logstash.conf:/usr/share/logstash/pipeline:ro
+      - ./monitoring/logstash:/usr/share/logstash/pipeline:ro
     networks:
       - cab_aggregator
+    depends_on:
+      - elasticsearch
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.13
@@ -335,4 +343,3 @@ networks:
 volumes:
   pg_data:
   mongo_data:
-

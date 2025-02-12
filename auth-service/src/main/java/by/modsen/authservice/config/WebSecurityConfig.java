@@ -25,6 +25,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/test/passenger").hasRole(UserRole.PASSENGER.name())
                         .requestMatchers("/test/driver").hasRole(UserRole.DRIVER.name())
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
