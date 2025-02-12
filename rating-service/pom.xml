@@ -106,7 +106,6 @@
             <version>${logstash-logback-encoder.version}</version>
         </dependency>
 
-
     </dependencies>
 
     <build>

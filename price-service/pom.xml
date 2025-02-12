@@ -75,7 +75,7 @@
         <dependency>
             <groupId>by.modsen</groupId>
             <artifactId>common-module</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${common-module.version}</version>
         </dependency>
 
         <dependency>

@@ -3,31 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
-        <relativePath/>
-    </parent>
-
-    <groupId>by.modsen</groupId>
     <artifactId>rides-service</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-    <properties>
-        <lombok.version>1.18.34</lombok.version>
-        <liquibase.version>4.27.0</liquibase.version>
-        <mapstruct.version>1.6.0</mapstruct.version>
-        <spring-cloud.version>2023.0.3</spring-cloud.version>
-        <springdoc.version>2.6.0</springdoc.version>
-        <common-module.version>0.0.1-SNAPSHOT</common-module.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <rest-assured.version>5.5.0</rest-assured.version>
-        <hamcrest.version>3.0</hamcrest.version>
-        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
-    </properties>
+    <parent>
+        <groupId>by.modsen</groupId>
+        <artifactId>cab-aggregator</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
     <dependencies>
         <dependency>
@@ -111,11 +94,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
@@ -170,11 +148,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>runtime</scope>
@@ -198,26 +171,6 @@
 
     </dependencies>
 
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-                <scope>provided</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <build>
         <plugins>
             <plugin>
@@ -230,7 +183,6 @@
                 <version>${liquibase.version}</version>
                 <configuration>
                     <changeLogFile>src/main/resources/db/changelog/db.changelog-master.xml</changeLogFile>
-                    <!--                    <propertyFile>liquibase.properties</propertyFile>-->
                     <url>jdbc:postgresql://localhost:5432/ride_db</url>
                     <username>vitya</username>
                     <password>22817</password>
