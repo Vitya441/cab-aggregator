@@ -4,7 +4,6 @@ import by.modsen.gatewayservice.util.RouteConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -24,9 +23,9 @@ public class WebSecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(auth -> auth
                         .pathMatchers(RouteConstants.PUBLIC_ROUTES.toArray(new String[0])).permitAll()
-                        .pathMatchers(HttpMethod.GET, RouteConstants.PASSENGER_ROUTES.toArray(new String[0])).hasRole("PASSENGER")
-                        .pathMatchers(HttpMethod.GET, RouteConstants.DRIVER_ROUTES.toArray(new String[0])).hasRole("DRIVER")
-
+                        .pathMatchers(RouteConstants.PASSENGER_ROUTES.toArray(new String[0])).hasRole("PASSENGER")
+                        .pathMatchers(RouteConstants.DRIVER_ROUTES.toArray(new String[0])).hasRole("DRIVER")
+                        .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter))
