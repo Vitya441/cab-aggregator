@@ -1,7 +1,3 @@
-### TODO: Тут тоже возня с портами
-### TODO: docker.host.internal:8080 работает только windows & macos
-### TODO: для Linux надо указывать IP своей машины: 172.17.0.1:8080
-
 global:
   scrape_interval: 5s  # Как часто запрашивать метрики
 
@@ -9,5 +5,11 @@ scrape_configs:
   - job_name: 'spring-boot-app'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['172.17.0.1:8080']
-
+      - targets: [ '172.17.0.1:8080',
+                   '172.17.0.1:8081',
+                   '172.17.0.1:8083',
+                   '172.17.0.1:8084',
+                   '172.17.0.1:8085',
+                   '172.17.0.1:8086',
+                   '172.17.0.1:8087',
+                   '172.17.0.1:8088']

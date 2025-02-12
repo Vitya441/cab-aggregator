@@ -3,16 +3,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-<!--    <artifactId>rides-service</artifactId>-->
-<!--    <packaging>jar</packaging>-->
-<!--    <description>Cab Aggregator Rides Service</description>-->
-
-<!--    <parent>-->
-<!--        <groupId>by.modsen</groupId>-->
-<!--        <artifactId>cab-aggregator</artifactId>-->
-<!--        <version>1.0-SNAPSHOT</version>-->
-<!--    </parent>-->
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -184,26 +174,22 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!--		Метрики       -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!--		Замена для Sleuth, даже сам spring boot в логах пишет использовать эту зависимость   -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-tracing-bridge-brave</artifactId>
         </dependency>
 
-        <!--	Zipkin юзается вместе с bridge-brave, визуализация трэйсов     -->
         <dependency>
             <groupId>io.zipkin.reporter2</groupId>
             <artifactId>zipkin-reporter-brave</artifactId>
         </dependency>
 
-        <!--		ELK (Elastick-Serach, Logstash, Kibana    -->
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
