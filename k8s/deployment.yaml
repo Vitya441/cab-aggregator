@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: passenger-api
+  labels:
+    app: passenger-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: passenger-api
+  template:
+    metadata:
+      labels:
+        app: passenger-api
+    spec:
+      containers:
+        - name: passenger-api
+          image: vitya4485/eureka-server:0.1
+          ports:
+            - containerPort: 8761
+
