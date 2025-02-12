@@ -36,10 +36,15 @@
         <mapstruct.version>1.6.0</mapstruct.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <springdoc.version>2.6.0</springdoc.version>
-        <common-module.version>0.0.1-SNAPSHOT</common-module.version>
+        <jakarta-validation.version>3.0.2</jakarta-validation.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <common-module.version>1.0-SNAPSHOT</common-module.version>
+        <keycloak.admin.version>25.0.2</keycloak.admin.version>
+        <stripe-java.version>24.20.0</stripe-java.version>
+        <rest-assured.version>5.5.0</rest-assured.version>
+        <hamcrest.version>3.0</hamcrest.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
     </properties>
 

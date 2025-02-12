@@ -3,27 +3,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
-        <relativePath/>
-    </parent>
-
-    <groupId>by.modsen</groupId>
     <artifactId>common-module</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-    <properties>
-        <jakarta.validation>3.0.2</jakarta.validation>
-        <lombok.version>1.18.34</lombok.version>
-    </properties>
+    <parent>
+        <groupId>by.modsen</groupId>
+        <artifactId>cab-aggregator</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
     <dependencies>
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.2</version>
+            <version>${jakarta-validation.version}</version>
         </dependency>
 
         <dependency>
