@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2025-02-16:insert-cars" author="Vitya441">
+        <insert tableName="car">
+            <column name="license_number" value="ABC123"/>
+            <column name="color" value="Red"/>
+            <column name="seats" value="3"/>
+            <column name="brand" value="Audi"/>
+            <column name="model" value="A5"/>
+            <column name="car_category" value="COMFORT"/>
+        </insert>
+
+        <insert tableName="car">
+            <column name="license_number" value="XYZ789"/>
+            <column name="color" value="Black"/>
+            <column name="seats" value="4"/>
+            <column name="brand" value="BMW"/>
+            <column name="model" value="X5"/>
+            <column name="car_category" value="BUSINESS"/>
+        </insert>
+
+        <insert tableName="car">
+            <column name="license_number" value="LMN456"/>
+            <column name="color" value="White"/>
+            <column name="seats" value="4"/>
+            <column name="brand" value="Toyota"/>
+            <column name="model" value="Corolla"/>
+            <column name="car_category" value="ECONOMY"/>
+        </insert>
+
+        <insert tableName="car">
+            <column name="license_number" value="QWE321"/>
+            <column name="color" value="Black"/>
+            <column name="seats" value="3"/>
+            <column name="brand" value="Mercedes-Benz"/>
+            <column name="model" value="W204"/>
+            <column name="car_category" value="COMFORT"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -5,9 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-<!--        WARNING: Liquibase doesn't work consistency with Spring and Maven both
-            spring.liquibase.enabled = false  ->  mvn liquibase:update, rollback...
--->
         <changeSet id="2024-11-05:empty-db" author="Vitya441">
                 <tagDatabase tag="v0"/>
         </changeSet>
@@ -24,5 +21,10 @@
                 <tagDatabase tag="v2"/>
         </changeSet>
 
+        <include file="v3/v3-db.changelog.xml" relativeToChangelogFile="true"/>
+
+        <changeSet id="2025-02-16:with-cars-data" author="Vitya441">
+                <tagDatabase tag="v3"/>
+        </changeSet>
 
 </databaseChangeLog>
