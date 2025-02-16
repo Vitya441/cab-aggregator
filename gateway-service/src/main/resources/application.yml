@@ -14,22 +14,33 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/api/v1/auth/**
+            - Path=/api/v1/auth/**, /auth-service/v3/api-docs
 
         - id: rides-service
           uri: lb://rides-service
           predicates:
-            - Path=/api/v1/rides/**
+            - Path=/api/v1/rides/**, /rides-service/v3/api-docs
 
         - id: passenger-service
           uri: lb://passenger-service
           predicates:
-            - Path=/api/v1/passengers/**
+            - Path=/api/v1/passengers/**, /passenger-service/v3/api-docs
 
         - id: driver-service
           uri: lb://driver-service
           predicates:
-            - Path=/api/v1/drivers/**, /api/v1/cars/**
+            - Path=/api/v1/drivers/**, /api/v1/cars/**, /driver-service/v3/api-docs
+
+        - id: rating-service
+          uri: lb://rating-service
+          predicates:
+            - Path=/api/v1/ratings/**, /rating-service/v3/api-docs
+
+        - id: promocode-service
+          uri: lb://promocode-service
+          predicates:
+            - Path=/api/v1/promocode/**, /promocode-service/v3/api-docs
+
 
   security:
     oauth2:
@@ -42,7 +53,32 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    oauth:
+      use-pkce-with-authorization-code-grant: true
+    persist-authorization: true
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service
 
+      - url: /auth-service/v3/api-docs
+        name: Auth Service
+
+      - url: /passenger-service/v3/api-docs
+        name: Passenger Service
+
+      - url: /driver-service/v3/api-docs
+        name: Driver Service
+
+      - url: /rides-service/v3/api-docs
+        name: Rides Service
+
+      - url: /promocode-service/v3/api-docs
+        name: Promocode Service
 
 
 logging:
